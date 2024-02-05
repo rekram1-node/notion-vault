@@ -14,11 +14,14 @@ datasource db {
     relationMode = "prisma"
 }
 
-model Post {
+model EncryptedDocument {
     id        Int      @id @default(autoincrement())
-    name      String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([name])
+    encryptedContent String
+    
+    userId String
+
+    @@index([userId])
 }
