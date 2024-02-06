@@ -1,0 +1,19 @@
+TODO:
+* convert to radix?
+* make sure password form looks ideal
+* add encryption/decryption logic
+* database?
+* navbar
+* add more linting rules ....
+* creating new secret urls
+* API key auth??? << probably not but idk
+
+Down the line:
+* integrate with notion further?
+* setup notion public integration
+* Demo, Test, Iterate
+
+Important:
+* Ensure code is vulnerability free and that the db is secure
+
+
