@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
@@ -13,6 +15,20 @@ export const env = createEnv({
       .refine(
         (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
         "You forgot to change the default URL"
+      ),
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
+      .string()
+      .url()
+      .refine(
+        (str) => !str.includes("YOUR_PUBLISHABLE_KEY_HERE"),
+        "You forgot to change the default clerk publishable key"
+      ),
+    CLERK_SECRET_KEY: z
+      .string()
+      .url()
+      .refine(
+        (str) => !str.includes("YOUR_SECRET_KEY_HERE"),
+        "You forgot to change the default clerk secret key"
       ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
