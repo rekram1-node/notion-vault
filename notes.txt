@@ -1,6 +1,4 @@
 TODO:
-* convert to radix?
-* make sure password form looks ideal
 * add encryption/decryption logic
 * database?
 * navbar
