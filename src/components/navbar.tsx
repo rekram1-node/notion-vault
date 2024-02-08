@@ -1,30 +1,36 @@
-import { HomeIcon, GearIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
+  const router = useRouter();
+  const isHome = () => router.pathname === "/";
+  const isActive = (href: string) => router.pathname.includes(href);
   return (
-    <nav className="flex items-center justify-between bg-gray-800 p-4 text-white shadow-lg">
+    <nav className="bg-surface-100 text-dark-text-500 flex items-center justify-between px-6 py-4 shadow-lg">
       <div className="flex items-center">
-        <Link href="/" passHref>
+        <Link href="/">
           <div className="flex cursor-pointer items-center">
-            {/* <Image src="/path-to-your-logo.png" alt="Logo" width={40} height={40} /> */}
-            <span className="ml-2 text-xl font-bold">Notion Vault</span>
+            <span className="text-primary-600 text-xl font-bold">
+              Notion Vault
+            </span>
           </div>
         </Link>
       </div>
 
-      <div className="flex items-center gap-10">
-        <Link href="/" passHref>
-          <div className="flex cursor-pointer items-center gap-1 transition duration-200 ease-in-out hover:text-gray-200">
-            <HomeIcon />
-            <span>Home</span>
+      <div className="flex items-center gap-8 text-lg">
+        <Link href="/">
+          <div
+            className={`hover:text-primary-500 flex cursor-pointer items-center transition-colors duration-200 ease-in-out ${isHome() ? "border-primary-500 border-b-2" : ""}`}
+          >
+            Home
           </div>
         </Link>
-        <Link href="/settings" passHref>
-          <div className="flex cursor-pointer items-center gap-1 transition duration-200 ease-in-out hover:text-gray-200">
-            <GearIcon />
-            <span>Settings</span>
+        <Link href="/settings">
+          <div
+            className={`hover:text-primary-500 flex cursor-pointer items-center transition-colors duration-200 ease-in-out ${isActive("/settings") ? "border-primary-500 border-b-2" : ""}`}
+          >
+            Settings
           </div>
         </Link>
       </div>

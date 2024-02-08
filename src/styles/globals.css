@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Serves as background pattern */
+.bg-primary-radial {
+    background-color: theme('colors.surface.50');
+    background-image: radial-gradient(at center, theme('colors.primary.300') 1px, transparent 1px);
+    background-size: 16px 16px;
+}
+

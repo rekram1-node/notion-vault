@@ -2,7 +2,6 @@ TODO:
 * add encryption/decryption logic
 * database?
 * navbar
-* add more linting rules ....
 * creating new secret urls
 * API key auth??? << probably not but idk
 
