@@ -7,11 +7,11 @@ const Navbar = () => {
   const isHome = () => router.pathname === "/";
   const isActive = (href: string) => router.pathname.includes(href);
   return (
-    <nav className="bg-surface-100 text-dark-text-500 flex items-center justify-between px-6 py-4 shadow-lg">
+    <nav className="shadow-l fixed top-0 z-50 flex w-full items-center justify-between bg-surface-100 px-6 py-4 text-dark-text-500">
       <div className="flex items-center">
         <Link href="/">
           <div className="flex cursor-pointer items-center">
-            <span className="text-primary-600 text-xl font-bold">
+            <span className="text-2xl font-extrabold text-primary-600">
               Notion Vault
             </span>
           </div>
@@ -21,14 +21,14 @@ const Navbar = () => {
       <div className="flex items-center gap-8 text-lg">
         <Link href="/">
           <div
-            className={`hover:text-primary-500 flex cursor-pointer items-center transition-colors duration-200 ease-in-out ${isHome() ? "border-primary-500 border-b-2" : ""}`}
+            className={`flex cursor-pointer items-center transition-colors duration-200 ease-in-out hover:text-primary-500 ${isHome() ? "border-b-2 border-primary-500" : ""}`}
           >
             Home
           </div>
         </Link>
         <Link href="/settings">
           <div
-            className={`hover:text-primary-500 flex cursor-pointer items-center transition-colors duration-200 ease-in-out ${isActive("/settings") ? "border-primary-500 border-b-2" : ""}`}
+            className={`flex cursor-pointer items-center transition-colors duration-200 ease-in-out hover:text-primary-500 ${isActive("/settings") ? "border-b-2 border-primary-500" : ""}`}
           >
             Settings
           </div>

@@ -1,11 +1,17 @@
 TODO:
+* create logo
 * add encryption/decryption logic
 * database?
-* navbar
 * creating new secret urls
-* API key auth??? << probably not but idk
+* Determine what would be on the settings page...
+
+Carefully Design the models, we need to keep in mind the following:
+* Limitations for a user since this is free
+* Plan tracking
+* Limits for # of pages and size of page
 
 Down the line:
+* theme options / prettify theme
 * integrate with notion further?
 * setup notion public integration
 * Demo, Test, Iterate
