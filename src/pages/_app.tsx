@@ -2,6 +2,7 @@ import { type AppType } from "next/app";
 import Layout from "~/pages/layout";
 import { Theme } from "@radix-ui/themes";
 import Head from "next/head";
+import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 
@@ -26,4 +27,4 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   );
 };
 
-export default MyApp;
+export default api.withTRPC(MyApp);

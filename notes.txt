@@ -1,9 +1,15 @@
-TODO:
-* create logo
-* add encryption/decryption logic
-* database?
-* creating new secret urls
-* Determine what would be on the settings page...
+TODO (in order of priority):
+* Finish Create Page Component w/ password validation and whatnot, be sure to add disable create button
+* Fix the cramped view with the list of protected pages  
+* Workout Page Decryption / encryption
+* Research Ideal DB Model to ensure usability
+* Create Model, Implement logic with trpc
+
+Next Levels of Priority:
+* Finalize theme
+* Logo Creation
+* Do we need any auth with the secret urls?
+
 
 Carefully Design the models, we need to keep in mind the following:
 * Limitations for a user since this is free

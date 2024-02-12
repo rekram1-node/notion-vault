@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "~/components/navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { useRouter } from "next/router";
+import { SnackbarProvider } from "notistack";
 
 export default function RootLayout({
   children,
@@ -13,8 +14,10 @@ export default function RootLayout({
   return (
     <>
       <ClerkProvider>
-        {!hideNavbarOnRoutes.includes(router.pathname) && <Navbar />}
-        <main>{children}</main>
+        <SnackbarProvider>
+          {!hideNavbarOnRoutes.includes(router.pathname) && <Navbar />}
+          <main>{children}</main>
+        </SnackbarProvider>
       </ClerkProvider>
     </>
   );

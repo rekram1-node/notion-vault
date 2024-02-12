@@ -78,7 +78,11 @@ export default {
         // info: '#2563eb',
         success: '#16a34a',
         warning: '#db7c0f',
-        error: '#b32356',
+        error: {
+          light: '#d91353',
+          normal: '#b32356',
+          dark: '#512333'
+        },
       },
     },
   },
