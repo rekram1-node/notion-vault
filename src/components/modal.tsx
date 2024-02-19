@@ -39,7 +39,7 @@ const Modal = ({
               Cancel
             </button>
             <button
-              className={`rounded px-4 py-2 ${actionTxt !== "Delete" ? "bg-primary-500 hover:bg-primary-700" : "bg-error-light hover:bg-error-normal"}`}
+              className={`rounded px-4 py-2 ${actionTxt !== "Delete" ? "bg-primary-500 hover:bg-primary-700" : "bg-error-light hover:bg-error-normal"} hover:bg-primary-700`}
               onClick={onConfirm}
             >
               {actionTxt}

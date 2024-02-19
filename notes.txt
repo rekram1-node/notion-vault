@@ -1,7 +1,15 @@
 TODO (in order of priority):
-* Finish Create Page Component w/ password validation and whatnot, be sure to add disable create button
-* Fix the cramped view with the list of protected pages  
-* Workout Page Decryption / encryption
+
+Enable Spend Management for all providers...
+
+Tomorrows Goals:
+* Adjust On create function to hash password and encrypt blank Text
+* Create TRPC endpoint to handle Document Creation. Should recieve
+  Salt, Hashed Password, Encrypted Content, Salt used for content
+  and lastly, the IV for the content
+* Test creation and ensure all is functional...
+
+* Page Decryption / encryption
 * Research Ideal DB Model to ensure usability
 * Create Model, Implement logic with trpc
 
@@ -17,7 +25,6 @@ Carefully Design the models, we need to keep in mind the following:
 * Limits for # of pages and size of page
 
 Down the line:
-* theme options / prettify theme
 * integrate with notion further?
 * setup notion public integration
 * Demo, Test, Iterate

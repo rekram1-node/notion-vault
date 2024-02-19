@@ -48,6 +48,7 @@ const PasswordForm = ({
                 if (e.key === "Enter") handlePasswordSubmit();
               }}
               className="input input-bordered border-neutral w-full rounded bg-surface-50 p-2 text-dark-text-500"
+              required
             />
             <button
               onClick={() => setEyeOpen(!eyeOpen)}
