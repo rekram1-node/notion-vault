@@ -61,9 +61,9 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
     confirmPassword !== password;
 
   const { mutate, isLoading: isCreatePageLoading } =
-    api.pages.create.useMutation({
+    api.encryptedDocuments.create.useMutation({
       onSuccess: () => {
-        void utils.pages.getAll.invalidate();
+        void utils.encryptedDocuments.getAll.invalidate();
         closeModal();
         enqueueSnackbar("Successfully created new page!", {
           autoHideDuration: 3000,

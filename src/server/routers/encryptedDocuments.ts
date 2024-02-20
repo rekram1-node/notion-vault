@@ -17,7 +17,7 @@ import {
 //   analytics: true,
 // });
 
-export const protectedPagesRouter = createTRPCRouter({
+export const encryptedDocumentRouter = createTRPCRouter({
   getAll: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx;
     const documents = await ctx.prisma.encryptedDocument.findMany({
@@ -32,55 +32,110 @@ export const protectedPagesRouter = createTRPCRouter({
     });
     return documents;
   }),
-  get: privateProcedure
+
+  getBase: privateProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const { userId } = ctx;
-      const page = await ctx.prisma.encryptedDocument.findUnique({
+      const document = await ctx.prisma.encryptedDocument.findUnique({
         where: {
           id: input.id,
           userId,
         },
       });
 
-      if (!page) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return page;
+      const { passwordSalt } = document;
+
+      return {
+        passwordSalt,
+      };
     }),
+
+  validatePassword: privateProcedure
+    .input(z.object({ id: z.string(), hashedPassword: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const document = await ctx.prisma.encryptedDocument.findUnique({
+        where: {
+          id: input.id,
+          userId,
+        },
+        select: {
+          passwordHash: true,
+          encryptedContent: true,
+          iv: true,
+          documentSalt: true,
+        },
+      });
+
+      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (input.hashedPassword !== document.passwordHash)
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      const { encryptedContent, iv, documentSalt } = document;
+
+      return {
+        encryptedContent,
+        iv,
+        documentSalt,
+      };
+    }),
+
+  get: privateProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const document = await ctx.prisma.encryptedDocument.findUnique({
+        where: {
+          id: input.id,
+          userId,
+        },
+      });
+
+      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return document;
+    }),
+
   update: privateProcedure
     .input(
       z.object({
         id: z.string(),
         encryptedContent: z.string(),
-      })
+      }),
     )
-    .mutation(async({ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
-      const page = await ctx.prisma.encryptedDocument.update({
+      const document = await ctx.prisma.encryptedDocument.update({
         data: {
           encryptedContent: input.encryptedContent,
         },
         where: {
           id: input.id,
           userId,
-        }
+        },
       });
-      if (!page) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
     }),
+
   delete: privateProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
 
-      const page = await ctx.prisma.encryptedDocument.delete({
+      const document = await ctx.prisma.encryptedDocument.delete({
         where: {
           id: input.id,
           userId,
-        }
+        },
       });
 
-      if (!page) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
     }),
+
   // We could make this more strict
   create: privateProcedure
     .input(

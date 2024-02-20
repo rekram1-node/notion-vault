@@ -1,13 +1,17 @@
+import { LoadingSpinner } from "./loading";
+
 const Modal = ({
   title,
   content,
   actionText,
+  isLoading,
   onCancel,
   onConfirm,
 }: {
   title: string;
   content: JSX.Element;
   actionText?: string;
+  isLoading: boolean;
   onCancel(): void;
   onConfirm(): void;
 }) => {
@@ -33,16 +37,16 @@ const Modal = ({
           {content}
           <div className="mt-4 flex justify-end space-x-2">
             <button
-              className={`rounded px-4 py-2 ${actionTxt !== "Delete" ? "bg-error-light hover:bg-error-normal" : "bg-primary-500 hover:bg-primary-700"}`}
+              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700`}
               onClick={onCancel}
             >
               Cancel
             </button>
             <button
-              className={`rounded px-4 py-2 ${actionTxt !== "Delete" ? "bg-primary-500 hover:bg-primary-700" : "bg-error-light hover:bg-error-normal"} hover:bg-primary-700`}
+              className={`rounded bg-error-light px-4 py-2 hover:bg-error-normal`}
               onClick={onConfirm}
             >
-              {actionTxt}
+              {!isLoading ? actionTxt : <LoadingSpinner />}
             </button>
           </div>
         </div>

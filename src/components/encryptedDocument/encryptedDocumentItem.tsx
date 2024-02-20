@@ -9,61 +9,62 @@ import {
 } from "@radix-ui/react-icons";
 import Modal from "../modal";
 
-export interface ProtectedPage {
+export interface EncryptedDocument {
   id: string;
   name: string;
 }
 
-const ListItem = ({ page }: { page: ProtectedPage }) => {
+const EncryptedDocumentItem = ({
+  document,
+}: {
+  document: EncryptedDocument;
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const [baseUrl, setBaseUrl] = useState("");
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const utils = api.useUtils();
 
-  const { mutate, isLoading: isDeleteLoading } = api.pages.delete.useMutation({
-    onSuccess: () => {
-      void utils.pages.getAll.invalidate();
-      setIsDeleteModalVisible(false); // Close the modal
-      enqueueSnackbar(`Deleted ${page.name}`, {
-        autoHideDuration: 3000,
-        variant: "success",
-      });
-    },
-    onError: (e) => {
-      const errorMessage = e.data?.zodError?.fieldErrors.content;
-      if (errorMessage?.[0]) {
-        enqueueSnackbar(errorMessage[0], {
+  const { mutate, isLoading: isDeleteLoading } =
+    api.encryptedDocuments.delete.useMutation({
+      onSuccess: () => {
+        void utils.encryptedDocuments.getAll.invalidate();
+        setIsDeleteModalVisible(false); // Close the modal
+        enqueueSnackbar(`Deleted ${document.name}`, {
           autoHideDuration: 3000,
-          variant: "error",
+          variant: "success",
         });
-      } else {
-        enqueueSnackbar(
-          "Failed to delete protected page! Please try again later.",
-          {
+      },
+      onError: (e) => {
+        const errorMessage = e.data?.zodError?.fieldErrors.content;
+        if (errorMessage?.[0]) {
+          enqueueSnackbar(errorMessage[0], {
             autoHideDuration: 3000,
             variant: "error",
-          },
-        );
-      }
-    },
-  });
+          });
+        } else {
+          enqueueSnackbar(
+            "Failed to delete protected page! Please try again later.",
+            {
+              autoHideDuration: 3000,
+              variant: "error",
+            },
+          );
+        }
+      },
+    });
 
   useEffect(() => {
     setBaseUrl(window.location.href);
   }, []);
 
-  const link = `${baseUrl}protected/${page.id}`;
+  const link = `${baseUrl}encrypted/${document.id}`; // baseUrl contains "/" after it
 
   const onCopy = () => {
     void navigator.clipboard.writeText(link);
-    enqueueSnackbar(`Copied ${page.name} url to clipboard`, {
+    enqueueSnackbar(`Copied ${document.name} url to clipboard`, {
       autoHideDuration: 3000,
       variant: "info",
     });
-  };
-
-  const onDelete = () => {
-    console.log("hello");
   };
 
   return (
@@ -72,7 +73,9 @@ const ListItem = ({ page }: { page: ProtectedPage }) => {
         <div className="relative mt-2 flex w-5/6 flex-col items-center rounded-xl bg-primary-500 shadow-md">
           <div className="w-full">
             <div className="card variant-glass flex items-center justify-between p-4">
-              <h5 className="h5 font-sans text-xl font-bold">{page.name}</h5>
+              <h5 className="h5 font-sans text-xl font-bold">
+                {document.name}
+              </h5>
               <div className="flex items-center">
                 <button
                   className="mr-2 flex items-center justify-center rounded-full bg-primary-500 text-surface-50"
@@ -104,15 +107,16 @@ const ListItem = ({ page }: { page: ProtectedPage }) => {
           title="Confirm Deletion"
           content={
             <p className="text-dark-text-500">
-              Are you sure you want to delete {page.name}?
+              Are you sure you want to delete {document.name}?
             </p>
           }
+          isLoading={isDeleteLoading}
           onCancel={() => setIsDeleteModalVisible(false)}
-          onConfirm={onDelete}
+          onConfirm={() => mutate({ id: document.id })}
         />
       )}
     </>
   );
 };
 
-export default ListItem;
+export default EncryptedDocumentItem;

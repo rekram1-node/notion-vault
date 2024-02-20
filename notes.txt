@@ -3,12 +3,12 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* Add getAll pages and delete page functionality
 * Add render page functionality
 * Consistent Naming Pattern, probably easiest to opt for EncryptedDocument (name of the model)
 
 After:
 * get render page to work
+* fix the lag issues that look kinda gross (specifically related to creation and deletion)
 
 * Create TRPC endpoint to handle Document Creation. Should recieve
   Salt, Hashed Password, Encrypted Content, Salt used for content

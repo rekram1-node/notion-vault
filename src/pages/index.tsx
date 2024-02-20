@@ -1,13 +1,14 @@
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import ProtectedPageList from "~/components/protectedPage/protectedPageList";
+import EncryptedDocumentsList from "~/components/encryptedDocument/encryptedDocumentsList";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "~/components/loading";
-import CreateForm from "~/components/protectedPage/createForm";
+import CreateForm from "~/components/encryptedDocument/createForm";
 
 const Home = () => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-  const { data, isLoading } = api.pages.getAll.useQuery();
+  const { data: documents, isLoading } =
+    api.encryptedDocuments.getAll.useQuery();
 
   return (
     <>
@@ -31,8 +32,8 @@ const Home = () => {
               </div>
             )}
             {!isLoading &&
-              (data && data.length > 0 ? (
-                <ProtectedPageList pages={data} />
+              (documents && documents.length > 0 ? (
+                <EncryptedDocumentsList documents={documents} />
               ) : (
                 <div className="flex flex-grow items-center justify-center pt-28 text-center text-primary-500 opacity-75">
                   <span className="text-2xl font-medium">
