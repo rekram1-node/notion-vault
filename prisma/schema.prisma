@@ -16,10 +16,13 @@ model EncryptedDocument {
   name             String
   encryptedContent String
   userId           String
-  documentSalt     Bytes
-  iv               Bytes
   passwordHash     String
-  passwordSalt     Bytes
+
+  // The following 3 are base64 strings that can be
+  // converted to byte arrays on client side
+  documentSalt String
+  iv           String
+  passwordSalt String
 
   @@index([userId])
 }

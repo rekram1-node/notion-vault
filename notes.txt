@@ -2,8 +2,14 @@ TODO (in order of priority):
 
 Enable Spend Management for all providers...
 
-Tomorrows Goals:
-* Adjust On create function to hash password and encrypt blank Text
+Next:
+* Add getAll pages and delete page functionality
+* Add render page functionality
+* Consistent Naming Pattern, probably easiest to opt for EncryptedDocument (name of the model)
+
+After:
+* get render page to work
+
 * Create TRPC endpoint to handle Document Creation. Should recieve
   Salt, Hashed Password, Encrypted Content, Salt used for content
   and lastly, the IV for the content
