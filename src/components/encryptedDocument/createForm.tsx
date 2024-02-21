@@ -1,20 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { useState, useEffect } from "react";
-import { createSalt, encryptData } from "~/encryption/encryption";
+import {
+  createSalt,
+  encryptData,
+  deriveDocumentKey,
+  hashPassword,
+} from "~/encryption/encryption";
 import { useUser } from "@clerk/nextjs";
 import { api } from "~/utils/api";
 import { useSnackbar } from "notistack";
 import { LoadingSpinner } from "~/components/loading";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const argon2 = require("argon2-browser");
-
-interface Argon2HashResult {
-  hash: Buffer;
-  hashHex: string;
-  encoded: string;
-}
 
 const CreateForm = ({ onClose }: { onClose: () => void }) => {
   const { user } = useUser();
@@ -95,34 +89,15 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
       const passwordString = user?.id + password;
       const documentSalt = createSalt();
       const iv = createSalt();
-      const derivedKeyHash = (await argon2.hash({
-        pass: passwordString,
-        salt: documentSalt,
-        time: 2,
-        mem: 2 ** 17,
-        parallelism: 1,
-        hashLen: 32,
-        type: argon2.ArgonType.Argon2id,
-      })) as Argon2HashResult;
-
-      const documentKey = derivedKeyHash?.hash;
+      const documentKey = await deriveDocumentKey(passwordString, documentSalt);
       const encryptedData = await encryptData("", iv, documentKey);
       const passwordSalt = createSalt();
-
-      const passwordHash = (await argon2.hash({
-        pass: passwordString,
-        salt: passwordSalt,
-        time: 2,
-        mem: 2 ** 17,
-        parallelism: 1,
-        hashLen: 32,
-        type: argon2.ArgonType.Argon2id,
-      })) as Argon2HashResult;
+      const passwordHash = await hashPassword(passwordString, passwordSalt);
 
       mutate({
         name,
         encryptedContent: encryptedData,
-        passwordHash: passwordHash.encoded,
+        passwordHash: passwordHash,
         passwordSalt: passwordSalt.toString("base64"),
         iv: iv.toString("base64"),
         documentSalt: documentSalt.toString("base64"),
