@@ -3,27 +3,17 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* Add render page functionality
-* Consistent Naming Pattern, probably easiest to opt for EncryptedDocument (name of the model)
-
-After:
-* get render page to work
+* make the editor pretty and have mvp features correctly
+* add autosave to editor
 * fix the lag issues that look kinda gross (specifically related to creation and deletion)
-
-* Create TRPC endpoint to handle Document Creation. Should recieve
-  Salt, Hashed Password, Encrypted Content, Salt used for content
-  and lastly, the IV for the content
 * Test creation and ensure all is functional...
-
-* Page Decryption / encryption
-* Research Ideal DB Model to ensure usability
-* Create Model, Implement logic with trpc
+* Look Into Notion stuff...
+* Expand to hash server side as well...
 
 Next Levels of Priority:
 * Finalize theme
 * Logo Creation
 * Do we need any auth with the secret urls?
-
 
 Carefully Design the models, we need to keep in mind the following:
 * Limitations for a user since this is free

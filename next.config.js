@@ -7,7 +7,7 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
+  transpilePackages: ['@mdxeditor/editor'],
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
@@ -18,6 +18,9 @@ const config = {
     defaultLocale: "en",
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // this will override the experiments
+    config.experiments = { ...config.experiments, topLevelAwait: true };
+    
     config.module.rules.push({
       test: /\.wasm$/,
       loader: "base64-loader",

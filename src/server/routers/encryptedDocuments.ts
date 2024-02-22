@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { createSalt } from "~/encryption/encryption";
+import { hashPassword } from "~/encryption/serverEncryption";
 import {
   createTRPCRouter,
   privateProcedure,
@@ -67,12 +68,16 @@ export const encryptedDocumentRouter = createTRPCRouter({
           encryptedContent: true,
           iv: true,
           documentSalt: true,
+          serverSidePasswordSalt: true,
         },
       });
 
       if (!document) throw new TRPCError({ code: "NOT_FOUND" });
 
-      if (input.hashedPassword !== document.passwordHash)
+      // execute addition hashing for comparison to DB
+      const passwordHash = await hashPassword(input.hashedPassword, document.serverSidePasswordSalt);
+      
+      if (passwordHash !== document.passwordHash)
         throw new TRPCError({ code: "UNAUTHORIZED" });
 
       const { encryptedContent, iv, documentSalt } = document;
@@ -152,14 +157,17 @@ export const encryptedDocumentRouter = createTRPCRouter({
       // const { success } = await ratelimit.limit(authorId);
       // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
       const { userId } = ctx;
+      const serverSidePasswordSalt = createSalt();
+      const passwordHash = await hashPassword(input.passwordHash, serverSidePasswordSalt);
 
       await ctx.prisma.encryptedDocument.create({
         data: {
           userId,
           name: input.name,
           encryptedContent: input.encryptedContent,
-          passwordHash: input.passwordHash,
+          passwordHash,
           passwordSalt: input.passwordSalt,
+          serverSidePasswordSalt,
           iv: input.iv,
           documentSalt: input.documentSalt,
         },

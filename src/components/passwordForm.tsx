@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { EyeOpenIcon, EyeNoneIcon, LockOpen1Icon } from "@radix-ui/react-icons";
+import { LoadingSpinner } from "./loading";
 
 export interface PasswordSubmitResult {
   valid: boolean;
@@ -10,21 +11,23 @@ interface PasswordFormParams {
   formTitle: string;
   inputPlaceholder: string;
   submitButtonName: string;
-  handlePassword(password: string): PasswordSubmitResult;
+  isLoading: boolean;
+  handlePassword(password: string): Promise<PasswordSubmitResult>;
 }
 
 const PasswordForm = ({
   formTitle,
   inputPlaceholder,
   submitButtonName,
+  isLoading,
   handlePassword,
 }: PasswordFormParams) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [eyeOpen, setEyeOpen] = useState(true);
 
-  const handlePasswordSubmit = () => {
-    const { valid, errMsg } = handlePassword(password);
+  const handlePasswordSubmit = async () => {
+    const { valid, errMsg } = await handlePassword(password);
     if (!valid) {
       setError(errMsg);
       setTimeout(() => setError(""), 820);
@@ -44,7 +47,9 @@ const PasswordForm = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handlePasswordSubmit();
+              if (e.key === "Enter") {
+                void handlePasswordSubmit();
+              }
             }}
             className="input input-bordered border-neutral w-full rounded bg-surface-50 p-2 text-dark-text-500"
             required
@@ -65,8 +70,17 @@ const PasswordForm = ({
           onClick={handlePasswordSubmit}
           className="flex items-center justify-center rounded bg-primary-600 p-2 text-surface-50 hover:bg-primary-950"
         >
-          <LockOpen1Icon className="mr-2" />
-          {submitButtonName}
+          {!isLoading && (
+            <>
+              <LockOpen1Icon className="mr-2" />
+              {submitButtonName}
+            </>
+          )}
+          {isLoading && (
+            <div className="py-1">
+              <LoadingSpinner />
+            </div>
+          )}
         </button>
       </div>
     </div>

@@ -18,6 +18,7 @@
     "@clerk/nextjs": "^4.29.6",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@mdxeditor/editor": "^2.9.0",
     "@planetscale/database": "^1.11.0",
     "@prisma/adapter-planetscale": "^5.6.0",
     "@prisma/client": "^5.6.0",
