@@ -1,5 +1,5 @@
 import { createTRPCRouter } from "~/server/api/trpc";
-import { encryptedDocumentRouter } from "../routers/encryptedDocuments"
+import { encryptedDocumentRouter } from "../routers/encryptedDocuments";
 
 /**
  * This is the primary router for your server.
@@ -7,7 +7,7 @@ import { encryptedDocumentRouter } from "../routers/encryptedDocuments"
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-    encryptedDocuments: encryptedDocumentRouter
+  encryptedDocuments: encryptedDocumentRouter,
 });
 
 // export type definition of API

@@ -139,7 +139,7 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
               Cancel
             </button>
             <button
-              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700 ${disabled || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+               className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700 ${disabled || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
               onClick={async () => mutate(name, password)}
               disabled={disabled || isLoading}
             >

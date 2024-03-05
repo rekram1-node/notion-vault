@@ -75,15 +75,18 @@ export const encryptedDocumentRouter = createTRPCRouter({
       if (!document) throw new TRPCError({ code: "NOT_FOUND" });
 
       // execute addition hashing for comparison to DB
-      const passwordHash = await hashPassword(input.hashedPassword, document.serverSidePasswordSalt);
-      
+      const passwordHash = await hashPassword(
+        input.hashedPassword,
+        document.serverSidePasswordSalt,
+      );
+
       if (passwordHash !== document.passwordHash)
         throw new TRPCError({ code: "UNAUTHORIZED" });
 
       const { encryptedContent, iv, documentSalt } = document;
 
       return {
-        encryptedContent: encryptedContent.toString('base64'),
+        encryptedContent: encryptedContent.toString("base64"),
         iv,
         documentSalt,
       };
@@ -116,7 +119,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.update({
         data: {
-          encryptedContent: Buffer.from(input.encryptedContent, 'base64'),
+          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
         },
         where: {
           id: input.id,
@@ -158,13 +161,16 @@ export const encryptedDocumentRouter = createTRPCRouter({
       // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
       const { userId } = ctx;
       const serverSidePasswordSalt = createSalt();
-      const passwordHash = await hashPassword(input.passwordHash, serverSidePasswordSalt);
+      const passwordHash = await hashPassword(
+        input.passwordHash,
+        serverSidePasswordSalt,
+      );
 
       await ctx.prisma.encryptedDocument.create({
         data: {
           userId,
           name: input.name,
-          encryptedContent: Buffer.from(input.encryptedContent, 'base64'),
+          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
           passwordHash,
           passwordSalt: input.passwordSalt,
           serverSidePasswordSalt,
