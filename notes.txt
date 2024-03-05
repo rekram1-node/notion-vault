@@ -3,12 +3,11 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* make the editor pretty and have mvp features correctly
 * add autosave to editor
 * fix the lag issues that look kinda gross (specifically related to creation and deletion)
+* Fix theme, adjust arrow colors
 * Test creation and ensure all is functional...
 * Look Into Notion stuff...
-* Expand to hash server side as well...
 
 Next Levels of Priority:
 * Finalize theme

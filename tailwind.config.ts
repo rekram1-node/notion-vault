@@ -88,5 +88,3 @@ export default {
   },
   plugins: [],
 } satisfies Config;
-
-// https://coolors.co/ece3ca-0b3954-ff6663-57c4e5-28afb0 

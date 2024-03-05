@@ -1,7 +1,4 @@
 "use client";
-// You can use this code in a separate component that's imported in your pages.
-import type { CodeBlockEditorDescriptor } from "@mdxeditor/editor";
-// import "@mdxeditor/editor/style.css";
 import React from "react";
 const {
   MDXEditor,
@@ -14,24 +11,26 @@ const {
   useCodeBlockEditorContext,
 } = await import("@mdxeditor/editor");
 
-const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
+const PlainTextCodeEditorDescriptor = {
   match: () => true,
   priority: 0,
-  Editor: (props) => {
+  Editor: () => {
     const cb = useCodeBlockEditorContext();
     return (
       <div onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}>
         <textarea
-          rows={3}
-          cols={20}
-          defaultValue={props.code}
+          rows={10} // Adjusted for a larger editor
+          cols={50} // Adjusted for a larger editor
+          // defaultValue={props.code}
           onChange={(e) => cb.setCode(e.target.value)}
+          autoFocus // Ensures cursor starts within the text box
         />
       </div>
     );
   },
 };
 
+// Enhanced editor setup
 const Editor = ({ decryptedContent }: { decryptedContent: string }) => {
   return (
     <MDXEditor

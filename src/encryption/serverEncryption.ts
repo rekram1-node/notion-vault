@@ -1,10 +1,9 @@
 import argon2 from "argon2";
 
-export const hashPassword = async(password: string, salt: Buffer | string) => {
-    const saltBuffer = typeof salt === 'string' ? Buffer.from(salt, 'base64') : salt;
+export const hashPassword = async(password: string, salt: Buffer) => {
     const hashedPassword = await argon2.hash(password, {
         type: 2,
-        salt: saltBuffer,
+        salt,
         timeCost: 2,
         memoryCost: 2 ** 17,
         hashLength: 32,

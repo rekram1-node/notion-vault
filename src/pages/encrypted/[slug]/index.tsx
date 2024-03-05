@@ -12,11 +12,7 @@ import {
   decryptData,
   deriveDocumentKey,
 } from "~/encryption/encryption";
-import dynamic from "next/dynamic";
-
-const Editor = dynamic(() => import("~/components/encryptedDocument/editor"), {
-  ssr: false,
-});
+import Editor from "~/components/editor/editor";
 
 export const getStaticProps = (async (ctx) => {
   const slug = ctx.params?.slug;
@@ -137,7 +133,8 @@ const EncryptedDocumentPage = ({
 
   return (
     <>
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center overflow-hidden">
+        {/* <div className="flex h-screen items-center justify-center"> */}
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
           <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
             <div className="flex flex-grow items-center justify-center pb-10 pt-10">
@@ -156,10 +153,9 @@ const EncryptedDocumentPage = ({
               />
             )}
             {documentData && (
-              <p className="text-dark-text-500">
-                Editor Below:
-                <Editor decryptedContent={documentData.decryptedContent} />
-              </p>
+              <div className="max-h-[calc(100vh-5rem)] w-full overflow-y-auto">
+                <Editor />
+              </div>
             )}
           </>
         )}

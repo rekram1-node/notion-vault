@@ -1,21 +1,68 @@
-import { PlusCircledIcon } from "@radix-ui/react-icons";
-import EncryptedDocumentsList from "~/components/encryptedDocument/encryptedDocumentsList";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PlusCircledIcon,
+} from "@radix-ui/react-icons";
+import EncryptedDocumentItem from "~/components/encryptedDocument/encryptedDocumentItem";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "~/components/loading";
 import CreateForm from "~/components/encryptedDocument/createForm";
 
 const Home = () => {
+  const [currentPage, setCurrentPage] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-  const { data: documents, isLoading } =
-    api.encryptedDocuments.getAll.useQuery();
+  // const { data: documents, isLoading } = api.encryptedDocuments.getAll.useQuery();
+
+  const documents = [
+    {
+      id: "clsxs6xos0000117u9txlx8sn",
+      name: "Another Page",
+    },
+    {
+      id: "clsxrmoq900001ckp41duxyh5",
+      name: "New Page",
+    },
+    {
+      id: "clsxrmoq900001ckp41duxyh5",
+      name: "New Page",
+    },
+    {
+      id: "clsxrmoq900001ckp41duxyh5",
+      name: "New Page",
+    },
+    {
+      id: "clsxrmoq900001ckp41duxyh5",
+      name: "New Page",
+    },
+    {
+      id: "clsxrmoq900001ckp41duxyh5",
+      name: "New Page",
+    },
+  ];
+  const isLoading = false;
+
+  const itemsPerPage = 5;
+
+  const totalPages = documents ? Math.ceil(documents.length / itemsPerPage) : 0;
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentDocuments = documents?.slice(startIndex, endIndex);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1 < totalPages ? prev + 1 : prev));
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 >= 0 ? prev - 1 : prev));
+  };
 
   return (
     <>
       <div className="flex h-screen items-center justify-center">
         <div
           className="relative mt-2 flex h-fit w-1/2 flex-col items-center rounded-xl bg-surface-100 shadow-md"
-          style={{ minWidth: "300px", minHeight: "400px" }}
+          style={{ minWidth: "300px", minHeight: "450px" }}
         >
           <div className="flex w-full flex-col">
             <div className="card variant-glass flex items-center justify-between p-4">
@@ -31,17 +78,31 @@ const Home = () => {
                 <LoadingSpinner size={60} />
               </div>
             )}
-            {!isLoading &&
-              (documents && documents.length > 0 ? (
-                <EncryptedDocumentsList documents={documents} />
-              ) : (
-                <div className="flex flex-grow items-center justify-center pt-28 text-center text-primary-500 opacity-75">
-                  <span className="text-2xl font-medium">
-                    You have no protected pages, click the add button to create
-                    one!
+            {!isLoading && (
+              <div className="flex-grow">
+                {currentDocuments && currentDocuments.length > 0 ? (
+                  currentDocuments.map((document, index) => (
+                    <EncryptedDocumentItem key={index} document={document} />
+                  ))
+                ) : (
+                  <div className="text-center">No documents found</div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 mt-auto flex items-center justify-between pt-4">
+                  <button onClick={prevPage} disabled={currentPage === 0}>
+                    <ChevronLeftIcon className="h-6 w-6" />
+                  </button>
+                  <span>
+                    {currentPage + 1} of {totalPages}
                   </span>
+                  <button
+                    onClick={nextPage}
+                    disabled={currentPage === totalPages - 1}
+                  >
+                    <ChevronRightIcon className="h-6 w-6" />
+                  </button>
                 </div>
-              ))}
+              </div>
+            )}
             {isCreateModalVisible && (
               <CreateForm onClose={() => setIsCreateModalVisible(false)} />
             )}
