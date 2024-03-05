@@ -30,39 +30,13 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import ExampleTheme from "~/components/editor/themes/ExampleTheme";
 
-/* Lexical Texts */
-import { textDailyStandup } from "./daily-standup";
-
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
 }
 
-const editorConfig = {
-  // The editor theme
-  theme: ExampleTheme,
-  namespace: "daily-standup-editor",
-  editorState: textDailyStandup,
-  // Handling of errors during update
-  onError(error: unknown) {
-    throw error;
-  },
-  // Any custom nodes go here
-  nodes: [
-    HeadingNode,
-    ListNode,
-    ListItemNode,
-    QuoteNode,
-    CodeNode,
-    CodeHighlightNode,
-    // TableNode,
-    // TableCellNode,
-    // TableRowNode,
-    AutoLinkNode,
-    LinkNode,
-  ],
-};
+export const EmptyState = `{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`;
 
-const Editor = () => {
+const Editor = ({ editorState }: { editorState: string }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -70,6 +44,31 @@ const Editor = () => {
   }, []);
 
   if (!isMounted) return null;
+
+  const editorConfig = {
+    // The editor theme
+    theme: ExampleTheme,
+    namespace: "daily-standup-editor",
+    editorState,
+    // Handling of errors during update
+    onError(error: unknown) {
+      throw error;
+    },
+    // Any custom nodes go here
+    nodes: [
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      QuoteNode,
+      CodeNode,
+      CodeHighlightNode,
+      // TableNode,
+      // TableCellNode,
+      // TableRowNode,
+      AutoLinkNode,
+      LinkNode,
+    ],
+  };
 
   return (
     <>

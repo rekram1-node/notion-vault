@@ -83,7 +83,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       const { encryptedContent, iv, documentSalt } = document;
 
       return {
-        encryptedContent,
+        encryptedContent: encryptedContent.toString('base64'),
         iv,
         documentSalt,
       };
@@ -116,7 +116,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.update({
         data: {
-          encryptedContent: input.encryptedContent,
+          encryptedContent: Buffer.from(input.encryptedContent, 'base64'),
         },
         where: {
           id: input.id,
@@ -164,7 +164,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
         data: {
           userId,
           name: input.name,
-          encryptedContent: input.encryptedContent,
+          encryptedContent: Buffer.from(input.encryptedContent, 'base64'),
           passwordHash,
           passwordSalt: input.passwordSalt,
           serverSidePasswordSalt,

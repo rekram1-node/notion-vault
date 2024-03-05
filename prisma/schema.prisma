@@ -14,7 +14,7 @@ model EncryptedDocument {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   name                   String
-  encryptedContent       String
+  encryptedContent       Bytes
   userId                 String
   passwordHash           String
   serverSidePasswordSalt Bytes

@@ -1,25 +1,14 @@
 import { useState, useEffect } from "react";
-import {
-  createSalt,
-  encryptData,
-  deriveDocumentKey,
-  hashPassword,
-} from "~/encryption/encryption";
-import { useUser } from "@clerk/nextjs";
-import { api } from "~/utils/api";
-import { useSnackbar } from "notistack";
 import { LoadingSpinner } from "~/components/loading";
+import { useCreateEncryptedDocument } from "./useCreateEncryptedDocument";
 
 const CreateForm = ({ onClose }: { onClose: () => void }) => {
-  const { user } = useUser();
-  const { enqueueSnackbar } = useSnackbar();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const utils = api.useUtils();
+  const { mutate, isLoading } = useCreateEncryptedDocument(() => closeModal());
 
   useEffect(() => {
     if (isTyping) {
@@ -54,62 +43,9 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
     !confirmPassword ||
     confirmPassword !== password;
 
-  const { mutate, isLoading: isCreatePageLoading } =
-    api.encryptedDocuments.create.useMutation({
-      onSuccess: () => {
-        void utils.encryptedDocuments.getAll.invalidate();
-        closeModal();
-        enqueueSnackbar("Successfully created new page!", {
-          autoHideDuration: 3000,
-          variant: "success",
-        });
-      },
-      onError: (e) => {
-        const errorMessage = e.data?.zodError?.fieldErrors.content;
-        if (errorMessage?.[0]) {
-          enqueueSnackbar(errorMessage[0], {
-            autoHideDuration: 3000,
-            variant: "error",
-          });
-        } else {
-          enqueueSnackbar(
-            "Failed to create protected page! Please try again later.",
-            {
-              autoHideDuration: 3000,
-              variant: "error",
-            },
-          );
-        }
-      },
-    });
-
-  const onCreate = async () => {
-    setIsLoading(true);
-    try {
-      const passwordString = user?.id + password;
-      const documentSalt = createSalt();
-      const iv = createSalt();
-      const documentKey = await deriveDocumentKey(passwordString, documentSalt);
-      const encryptedData = await encryptData("", iv, documentKey);
-      const passwordSalt = createSalt();
-      const passwordHash = await hashPassword(passwordString, passwordSalt);
-
-      mutate({
-        name,
-        encryptedContent: encryptedData,
-        passwordHash: passwordHash,
-        passwordSalt: passwordSalt.toString("base64"),
-        iv: iv.toString("base64"),
-        documentSalt: documentSalt.toString("base64"),
-      });
-      setIsLoading(isCreatePageLoading);
-    } catch (e) {
-      enqueueSnackbar("failed to hash password", {
-        autoHideDuration: 3000,
-        variant: "error",
-      });
-    }
-  };
+  // const onCreate = async () => {
+  //   await mutate(password, name);
+  // };
 
   const closeModal = () => {
     setPassword("");
@@ -203,9 +139,9 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
               Cancel
             </button>
             <button
-              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700 ${disabled || isCreatePageLoading ? "cursor-not-allowed opacity-50" : ""}`}
-              onClick={onCreate}
-              disabled={disabled || isCreatePageLoading}
+              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700 ${disabled || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+              onClick={async () => mutate(name, password)}
+              disabled={disabled || isLoading}
             >
               {!isLoading ? "Create" : <LoadingSpinner />}
             </button>

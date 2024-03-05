@@ -154,7 +154,7 @@ const EncryptedDocumentPage = ({
             )}
             {documentData && (
               <div className="max-h-[calc(100vh-5rem)] w-full overflow-y-auto">
-                <Editor />
+                <Editor editorState={documentData.decryptedContent} />
               </div>
             )}
           </>

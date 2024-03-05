@@ -12,35 +12,8 @@ import CreateForm from "~/components/encryptedDocument/createForm";
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-  // const { data: documents, isLoading } = api.encryptedDocuments.getAll.useQuery();
-
-  const documents = [
-    {
-      id: "clsxs6xos0000117u9txlx8sn",
-      name: "Another Page",
-    },
-    {
-      id: "clsxrmoq900001ckp41duxyh5",
-      name: "New Page",
-    },
-    {
-      id: "clsxrmoq900001ckp41duxyh5",
-      name: "New Page",
-    },
-    {
-      id: "clsxrmoq900001ckp41duxyh5",
-      name: "New Page",
-    },
-    {
-      id: "clsxrmoq900001ckp41duxyh5",
-      name: "New Page",
-    },
-    {
-      id: "clsxrmoq900001ckp41duxyh5",
-      name: "New Page",
-    },
-  ];
-  const isLoading = false;
+  const { data: documents, isLoading } =
+    api.encryptedDocuments.getAll.useQuery();
 
   const itemsPerPage = 5;
 
