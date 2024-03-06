@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { api } from "~/utils/api";
+import { useSnackbar } from "notistack";
+import { encryptData, deriveDocumentKey } from "~/encryption/encryption";
+
 /* Lexical Design System */
+import type { EditorState } from "lexical";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { TRANSFORMERS } from "@lexical/markdown";
-// import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
 
 /* Lexical Plugins Local */
 import ToolbarPlugin from "~/components/editor/plugins/ToolbarPlugin";
@@ -36,8 +41,46 @@ function Placeholder() {
 
 export const EmptyState = `{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`;
 
-const Editor = ({ editorState }: { editorState: string }) => {
+const Editor = ({
+  editorState,
+  documentId,
+  passwordString,
+  documentSalt,
+  iv,
+}: {
+  editorState: string;
+  documentId: string;
+  passwordString: string;
+  documentSalt: string;
+  iv: string;
+}) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [isMounted, setIsMounted] = useState(false);
+
+  // ignore loading for now...
+  const { mutate } = api.encryptedDocuments.update.useMutation({
+    onSuccess: () => {
+      // This should really be done "google drive style"
+      enqueueSnackbar("saved changes", {
+        autoHideDuration: 2000,
+        variant: "success",
+      });
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage?.[0]) {
+        enqueueSnackbar(errorMessage[0], {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar("Failed to save page content! Contact Support", {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      }
+    },
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -82,13 +125,32 @@ const Editor = ({ editorState }: { editorState: string }) => {
               ErrorBoundary={LexicalErrorBoundary}
             />
             <OnChangePlugin
-              onChange={(editorState) => {
-                editorState.read(() => {
-                  // write to database, local storage, etc.
-                  const value = JSON.stringify(editorState); // or JSON.stringify(editorState.toJSON())
-                  console.log(value);
-                });
-              }}
+              // need to memoize or something, sends too many updates
+              onChange={debounce(async (editorState: EditorState) => {
+                try {
+                  const rawEditorContent = JSON.stringify(editorState);
+                  if (true) {
+                    const documentKey = await deriveDocumentKey(
+                      passwordString,
+                      documentSalt,
+                    );
+                    const encryptedContent = await encryptData(
+                      rawEditorContent,
+                      iv,
+                      documentKey,
+                    );
+                    void mutate({
+                      id: documentId,
+                      encryptedContent,
+                    });
+                  }
+                } catch (e) {
+                  enqueueSnackbar("Failed to autosave: " + String(e), {
+                    autoHideDuration: 3000,
+                    variant: "error",
+                  });
+                }
+              }, 500)}
             />
             <ListPlugin />
             <HistoryPlugin />

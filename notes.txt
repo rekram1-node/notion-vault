@@ -3,23 +3,26 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* fix laggy encrypted document creation
+* fix debounce spams
 * fix password error from resizing entire form << should look at picture on phone for fix
-* add autosave to editor
-* fix linting for ts files it doesn't seem to be formatting on save...
 * Fix theme, adjust arrow colors
+* fix npm build errors
+* fix laggy encrypted document creation << still seems to be some lag with the hook
 
 Next Levels of Priority:
 * Finalize theme
 * Logo Creation
 * Do we need any auth with the secret urls?
 * Look Into Notion stuff...
+* Squash these ugly git commits? hahaha
+* Update favicon
 
 Limitations / Guardrails:
 * Limitations for a user since this is free
 * Limits for # of pages and length of page content?
 * RateLimiting
 * Rate limit page decryption attempts
+* check max password length
 
 Down the line:
 * setup notion public integration

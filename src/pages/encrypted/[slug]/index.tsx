@@ -28,10 +28,9 @@ export const getStaticPaths = () => {
 };
 
 interface DocumentData {
-  // encryptedContent: string;
   decryptedContent: string;
-  // iv: string;
-  // documentSalt: string;
+  iv: string;
+  documentSalt: string;
 }
 
 const EncryptedDocumentPage = ({
@@ -68,6 +67,8 @@ const EncryptedDocumentPage = ({
       );
       setDocumentData({
         decryptedContent,
+        iv: data.iv,
+        documentSalt: data.documentSalt,
       });
     },
     onError: (e) => {
@@ -89,42 +90,40 @@ const EncryptedDocumentPage = ({
     },
   });
 
-  /*
-    Add error handling, try catching and make more snappy...
-  */
   const handlePasswordSubmit = async (
     password: string,
   ): Promise<PasswordSubmitResult> => {
-    // try {
+    try {
+      if (!salt?.passwordSalt) {
+        return {
+          valid: false,
+          errMsg: "Document is missing critical data - contact support",
+        };
+      }
 
-    // } catch (e) {
+      if (password.length === 0) {
+        return {
+          valid: false,
+          errMsg: "Invalid Password",
+        };
+      }
 
-    // }
-    if (!salt?.passwordSalt) {
+      setPasswordString(user?.id + password);
+      const passwordHash = await hashPassword(
+        user?.id + password,
+        salt.passwordSalt,
+      );
+
+      validatePasswordMutation({
+        id: documentId,
+        hashedPassword: passwordHash,
+      });
+    } catch (e) {
       return {
         valid: false,
-        errMsg: "Document is missing critical data - contact support",
+        errMsg: String(e),
       };
     }
-
-    if (password.length === 0) {
-      return {
-        valid: false,
-        errMsg: "Invalid Password",
-      };
-    }
-
-    setPasswordString(user?.id + password);
-    const passwordHash = await hashPassword(
-      user?.id + password,
-      salt.passwordSalt,
-    );
-
-    validatePasswordMutation({
-      id: documentId,
-      hashedPassword: passwordHash,
-    });
-
     return {
       valid: true,
       errMsg: "",
@@ -134,7 +133,6 @@ const EncryptedDocumentPage = ({
   return (
     <>
       <div className="flex h-screen items-center justify-center overflow-hidden">
-        {/* <div className="flex h-screen items-center justify-center"> */}
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
           <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
             <div className="flex flex-grow items-center justify-center pb-10 pt-10">
@@ -154,7 +152,13 @@ const EncryptedDocumentPage = ({
             )}
             {documentData && (
               <div className="max-h-[calc(100vh-5rem)] w-full overflow-y-auto">
-                <Editor editorState={documentData.decryptedContent} />
+                <Editor
+                  editorState={documentData.decryptedContent}
+                  documentId={documentId}
+                  passwordString={passwordString}
+                  documentSalt={documentData.documentSalt}
+                  iv={documentData.iv}
+                />
               </div>
             )}
           </>
