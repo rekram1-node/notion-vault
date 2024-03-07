@@ -1,0 +1,39 @@
+TODO (in order of priority):
+
+Enable Spend Management for all providers...
+
+Next:
+* Fix theme, adjust arrow colors
+* fix laggy encrypted document creation << still seems to be some lag with the hook
+
+Next Levels of Priority:
+* Finalize theme
+* Logo Creation
+* Do we need any auth with the secret urls?
+* Look Into Notion stuff...
+* Squash these ugly git commits? hahaha
+* find planet scale alternative...
+* Update favicon
+* ensure all editor commands work as expected...
+
+Buff Editor:
+* fix debounce spams (throttle or debounce autosaving)
+* Show some indication that saving is being done <<
+* Ensure all toolbar actions work (as far as I know link is the only broken thing)
+
+Limitations / Guardrails:
+* Limitations for a user since this is free
+* Limits for # of pages and length of page content?
+* RateLimiting
+* Rate limit page decryption attempts
+* check max password length
+* compressing text content????
+
+Down the line:
+* setup notion public integration
+
+Important:
+* Need to make sure that code merges require permission of at least 1 other person at some point
+* Wait till alpha is complete to do so^
+
+
