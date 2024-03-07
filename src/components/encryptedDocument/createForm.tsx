@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
+import { debounce } from "lodash";
 import { LoadingSpinner } from "~/components/loading";
 import { useCreateEncryptedDocument } from "./useCreateEncryptedDocument";
 
@@ -7,31 +8,14 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const { mutate, isLoading } = useCreateEncryptedDocument(() => closeModal());
-
-  useEffect(() => {
-    if (isTyping) {
-      const handler = setTimeout(() => {
-        if (!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)) {
-          setError(
-            "Password needs: 8 characters, at least one number, at least one uppercase and one lowercase letter.",
-          );
-        } else if (password !== confirmPassword && confirmPassword !== "") {
-          setError("Passwords do not match.");
-        } else {
-          setError("");
-        }
-        setIsTyping(false);
-      }, 500); // Delay for 500ms before showing error
-
-      return () => clearTimeout(handler);
-    }
-  }, [password, confirmPassword, isTyping]);
 
   const passwordClassName = (err: string) =>
     `block w-full rounded-lg border ${err ? "border-red-500" : "border-dark-text-200"} bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 ${err ? "" : "focus:border-primary-500"} focus:outline-none`;
-  const setPasswordClassName = passwordClassName(error);
+  const setPasswordClassName =
+    error !== "Passwords do not match."
+      ? passwordClassName(error)
+      : passwordClassName("");
   const confirmPasswordClassName =
     error === "Passwords do not match."
       ? passwordClassName(error)
@@ -39,13 +23,10 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
 
   const disabled =
     error !== "" ||
+    !name ||
     !password ||
     !confirmPassword ||
     confirmPassword !== password;
-
-  // const onCreate = async () => {
-  //   await mutate(password, name);
-  // };
 
   const closeModal = () => {
     setPassword("");
@@ -53,6 +34,40 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
     setError("");
     setName("");
     onClose();
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const setDebouncedError = useCallback(
+    debounce((err: string) => {
+      setError(err);
+    }, 750),
+    [],
+  );
+
+  const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setPassword(value);
+    if (!value) {
+      setDebouncedError("");
+    } else if (!value.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)) {
+      setDebouncedError(
+        "Password needs: 8 characters, at least one number, at least one uppercase and one lowercase letter.",
+      );
+    } else {
+      setError("");
+    }
+  };
+
+  const onConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.currentTarget;
+    setConfirmPassword(value);
+    if (!value) {
+      setDebouncedError("");
+    } else if (value !== password) {
+      setDebouncedError("Passwords do not match.");
+    } else {
+      setError("");
+    }
   };
 
   return (
@@ -80,11 +95,13 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                   <input
                     name="name"
                     id="name"
+                    required
                     placeholder="Name of the page"
                     className="block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500"
                     value={name}
                     onChange={(e) => {
-                      setName(e.target.value);
+                      const { value } = e.currentTarget;
+                      setName(value);
                     }}
                   />
                 </div>
@@ -96,13 +113,11 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     type="password"
                     name="password"
                     id="password"
+                    required
                     placeholder="••••••••"
                     className={setPasswordClassName}
                     value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setIsTyping(true);
-                    }}
+                    onChange={onPasswordChange}
                   />
                 </div>
                 <div className="mb-1">
@@ -113,23 +128,22 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     type="password"
                     name="confirm-password"
                     id="confirm-password"
+                    required
                     placeholder="••••••••"
                     className={confirmPasswordClassName}
                     value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      setIsTyping(true);
-                    }}
+                    onChange={onConfirmPasswordChange}
                     onKeyDown={(e) => {
+                      if (disabled || isLoading) return;
                       if (e.key === "Enter") {
                         void mutate(name, password);
                       }
                     }}
                   />
                 </div>
-                {error && (
-                  <p className="mt-1 text-xs italic text-red-500">{error}</p>
-                )}
+                <div className="mt-1 h-5 w-full max-w-md">
+                  <p className="text-xs italic text-red-500">{error}</p>
+                </div>
                 <p className="text-s mt-4 italic text-dark-text-400">
                   This password will be used to decrypt your page, remember it
                 </p>

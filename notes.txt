@@ -4,7 +4,6 @@ Enable Spend Management for all providers...
 
 Next:
 * fix debounce spams
-* fix password error from resizing entire form << should look at picture on phone for fix
 * Fix theme, adjust arrow colors
 * fix laggy encrypted document creation << still seems to be some lag with the hook
 
