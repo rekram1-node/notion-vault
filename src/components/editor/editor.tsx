@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { debounce } from "lodash";
 import { api } from "~/utils/api";
 import { useSnackbar } from "notistack";
@@ -16,7 +16,7 @@ import { TRANSFORMERS } from "@lexical/markdown";
 
 /* Lexical Plugins Local */
 import ToolbarPlugin from "~/components/editor/plugins/ToolbarPlugin";
-import AutoLinkPlugin from "~/components/editor/plugins/AutoLinkPlugin";
+// import AutoLinkPlugin from "~/components/editor/plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "~/components/editor/plugins/CodeHighlightPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
@@ -61,10 +61,10 @@ const Editor = ({
   const { mutate } = api.encryptedDocuments.update.useMutation({
     onSuccess: () => {
       // This should really be done "google drive style"
-      enqueueSnackbar("saved changes", {
-        autoHideDuration: 2000,
-        variant: "success",
-      });
+      // enqueueSnackbar("saved changes", {
+      //   autoHideDuration: 2000,
+      //   variant: "success",
+      // });
     },
     onError: (e) => {
       const errorMessage = e.data?.zodError?.fieldErrors.content;
@@ -82,6 +82,35 @@ const Editor = ({
     },
   });
 
+  const autoSave = async (editorState: EditorState) => {
+    try {
+      const rawEditorContent = JSON.stringify(editorState);
+      if (true) {
+        const documentKey = await deriveDocumentKey(
+          passwordString,
+          documentSalt,
+        );
+        const encryptedContent = await encryptData(
+          rawEditorContent,
+          iv,
+          documentKey,
+        );
+        void mutate({
+          id: documentId,
+          encryptedContent,
+        });
+      }
+    } catch (e) {
+      enqueueSnackbar("Failed to autosave: " + String(e), {
+        autoHideDuration: 3000,
+        variant: "error",
+      });
+    }
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onChange = useCallback(debounce(autoSave, 1000), []);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -91,7 +120,7 @@ const Editor = ({
   const editorConfig = {
     // The editor theme
     theme: ExampleTheme,
-    namespace: "daily-standup-editor",
+    namespace: "encrypted-document-editor",
     editorState,
     // Handling of errors during update
     onError(error: unknown) {
@@ -126,31 +155,7 @@ const Editor = ({
             />
             <OnChangePlugin
               // need to memoize or something, sends too many updates
-              onChange={debounce(async (editorState: EditorState) => {
-                try {
-                  const rawEditorContent = JSON.stringify(editorState);
-                  if (true) {
-                    const documentKey = await deriveDocumentKey(
-                      passwordString,
-                      documentSalt,
-                    );
-                    const encryptedContent = await encryptData(
-                      rawEditorContent,
-                      iv,
-                      documentKey,
-                    );
-                    void mutate({
-                      id: documentId,
-                      encryptedContent,
-                    });
-                  }
-                } catch (e) {
-                  enqueueSnackbar("Failed to autosave: " + String(e), {
-                    autoHideDuration: 3000,
-                    variant: "error",
-                  });
-                }
-              }, 500)}
+              onChange={onChange}
             />
             <ListPlugin />
             <HistoryPlugin />
@@ -158,7 +163,7 @@ const Editor = ({
             <CodeHighlightPlugin />
             <LinkPlugin />
             <TabIndentationPlugin />
-            <AutoLinkPlugin />
+            {/* <AutoLinkPlugin /> */} {/* autolink plugin causes errors */}
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
           </div>
         </div>

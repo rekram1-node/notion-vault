@@ -3,7 +3,6 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* fix debounce spams
 * Fix theme, adjust arrow colors
 * fix laggy encrypted document creation << still seems to be some lag with the hook
 
@@ -15,6 +14,12 @@ Next Levels of Priority:
 * Squash these ugly git commits? hahaha
 * find planet scale alternative...
 * Update favicon
+* ensure all editor commands work as expected...
+
+Buff Editor:
+* fix debounce spams (throttle or debounce autosaving)
+* Show some indication that saving is being done <<
+* Ensure all toolbar actions work (as far as I know link is the only broken thing)
 
 Limitations / Guardrails:
 * Limitations for a user since this is free
@@ -22,6 +27,7 @@ Limitations / Guardrails:
 * RateLimiting
 * Rate limit page decryption attempts
 * check max password length
+* compressing text content????
 
 Down the line:
 * setup notion public integration
