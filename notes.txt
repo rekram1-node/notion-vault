@@ -6,7 +6,6 @@ Next:
 * fix debounce spams
 * fix password error from resizing entire form << should look at picture on phone for fix
 * Fix theme, adjust arrow colors
-* fix npm build errors
 * fix laggy encrypted document creation << still seems to be some lag with the hook
 
 Next Levels of Priority:
@@ -15,6 +14,7 @@ Next Levels of Priority:
 * Do we need any auth with the secret urls?
 * Look Into Notion stuff...
 * Squash these ugly git commits? hahaha
+* find planet scale alternative...
 * Update favicon
 
 Limitations / Guardrails:

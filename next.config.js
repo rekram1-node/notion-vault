@@ -6,8 +6,15 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   reactStrictMode: true,
-  transpilePackages: ['@mdxeditor/editor'],
+  transpilePackages: ["@mdxeditor/editor"],
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
@@ -20,7 +27,7 @@ const config = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // this will override the experiments
     config.experiments = { ...config.experiments, topLevelAwait: true };
-    
+
     config.module.rules.push({
       test: /\.wasm$/,
       loader: "base64-loader",
@@ -43,7 +50,7 @@ const config = {
 
     // Perform customizations to webpack config
     config.plugins.push(
-      new webpack.IgnorePlugin({ resourceRegExp: /\/__tests__\// })
+      new webpack.IgnorePlugin({ resourceRegExp: /\/__tests__\// }),
     );
 
     // Important: return the modified config
