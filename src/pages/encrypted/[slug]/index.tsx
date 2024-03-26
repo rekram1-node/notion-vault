@@ -132,7 +132,7 @@ const EncryptedDocumentPage = ({
 
   return (
     <>
-      <div className="flex h-screen items-center justify-center overflow-hidden">
+      <div className="flex h-screen w-full items-center justify-center overflow-hidden">
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
           <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
             <div className="flex flex-grow items-center justify-center pb-10 pt-10">
@@ -143,8 +143,8 @@ const EncryptedDocumentPage = ({
           <>
             {!documentData && (
               <PasswordForm
-                formTitle="Your content is locked. Verify your master password to continue"
-                inputPlaceholder="Enter Master Password"
+                formTitle="Your content is locked. Enter your password to continue"
+                inputPlaceholder="Enter Password"
                 submitButtonName="Unlock"
                 isLoading={isValidatePasswordLoading}
                 handlePassword={handlePasswordSubmit}
@@ -152,7 +152,9 @@ const EncryptedDocumentPage = ({
             )}
             {documentData && (
               // <div className="max-h-[calc(100vh-5rem)] w-full overflow-y-auto">
-              <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-full overflow-y-auto">
+              // <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-full overflow-y-auto">
+              // <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-screen overflow-y-auto">
+              <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-[1200px] overflow-y-auto">
                 <Editor
                   editorState={documentData.decryptedContent}
                   documentId={documentId}

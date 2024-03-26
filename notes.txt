@@ -3,12 +3,13 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
+* migrate to turso
+* create notion flow
 * Fix theme, adjust arrow colors
-* fix laggy encrypted document creation << still seems to be some lag with the hook
+* editor does not mean MVP requirements...
 
 Next Levels of Priority:
 * Finalize theme
-* Logo Creation
 * Do we need any auth with the secret urls?
 * Look Into Notion stuff...
 * Squash these ugly git commits? hahaha

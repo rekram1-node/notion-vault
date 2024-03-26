@@ -53,26 +53,37 @@ const Home = () => {
             )}
             {!isLoading && (
               <div className="flex-grow">
+                {" "}
+                {/* Updated this line */}
                 {currentDocuments && currentDocuments.length > 0 ? (
                   currentDocuments.map((document, index) => (
                     <EncryptedDocumentItem key={index} document={document} />
                   ))
                 ) : (
-                  <div className="text-center">No documents found</div>
+                  <div className="mx-auto flex max-w-4xl items-center justify-center p-36">
+                    <div className="text-center text-primary-500">
+                      You have no encrypted documents, click the plus sign to
+                      create one
+                    </div>
+                  </div>
                 )}
                 <div className="absolute bottom-0 left-0 right-0 mt-auto flex items-center justify-between pt-4">
-                  <button onClick={prevPage} disabled={currentPage === 0}>
-                    <ChevronLeftIcon className="h-6 w-6" />
-                  </button>
-                  <span>
-                    {currentPage + 1} of {totalPages}
-                  </span>
-                  <button
-                    onClick={nextPage}
-                    disabled={currentPage === totalPages - 1}
-                  >
-                    <ChevronRightIcon className="h-6 w-6" />
-                  </button>
+                  {totalPages > 0 && (
+                    <>
+                      <button onClick={prevPage} disabled={currentPage === 0}>
+                        <ChevronLeftIcon className="h-9 w-9 text-primary-600" />
+                      </button>
+                      <span className="text-primary-600">
+                        {currentPage + 1} of {totalPages}
+                      </span>
+                      <button
+                        onClick={nextPage}
+                        disabled={currentPage === totalPages - 1}
+                      >
+                        <ChevronRightIcon className="h-9 w-9 text-primary-600" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}

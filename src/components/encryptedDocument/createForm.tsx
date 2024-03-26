@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { debounce } from "lodash";
 import { LoadingSpinner } from "~/components/loading";
 import { useCreateEncryptedDocument } from "./useCreateEncryptedDocument";
@@ -7,22 +7,15 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [error, setError] = useState("");
   const { mutate, isLoading } = useCreateEncryptedDocument(() => closeModal());
 
-  const passwordClassName = (err: string) =>
-    `block w-full rounded-lg border ${err ? "border-red-500" : "border-dark-text-200"} bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 ${err ? "" : "focus:border-primary-500"} focus:outline-none`;
-  const setPasswordClassName =
-    error !== "Passwords do not match."
-      ? passwordClassName(error)
-      : passwordClassName("");
-  const confirmPasswordClassName =
-    error === "Passwords do not match."
-      ? passwordClassName(error)
-      : passwordClassName("");
+  const validPassword =
+    password !== "" && password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/);
+  const passwordsMatch = confirmPassword !== "" && password === confirmPassword;
+  const isError = !validPassword || !passwordsMatch;
 
   const disabled =
-    error !== "" ||
+    isError ||
     !name ||
     !password ||
     !confirmPassword ||
@@ -31,43 +24,18 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
   const closeModal = () => {
     setPassword("");
     setConfirmPassword("");
-    setError("");
     setName("");
     onClose();
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setDebouncedError = useCallback(
-    debounce((err: string) => {
-      setError(err);
-    }, 750),
-    [],
-  );
-
   const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setPassword(value);
-    if (!value) {
-      setDebouncedError("");
-    } else if (!value.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)) {
-      setDebouncedError(
-        "Password needs: 8 characters, at least one number, at least one uppercase and one lowercase letter.",
-      );
-    } else {
-      setError("");
-    }
   };
 
   const onConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.currentTarget;
+    const { value } = e.target;
     setConfirmPassword(value);
-    if (!value) {
-      setDebouncedError("");
-    } else if (value !== password) {
-      setDebouncedError("Passwords do not match.");
-    } else {
-      setError("");
-    }
   };
 
   return (
@@ -85,9 +53,9 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
           <h2 className="text-lg font-bold text-dark-text-500">
             Create New Protected Page
           </h2>
-          <form className="mt-2 h-auto w-full max-w-2xl">
-            <div className="-mx-3 mb-6 flex flex-wrap">
-              <div className="w-full px-3 pt-2">
+          <form className="mt-2 h-auto w-full" style={{ minWidth: "600px" }}>
+            <div className="flexflex-wrap -mx-3 mb-6">
+              <div className="px-3 pt-2">
                 <div className="mb-4">
                   <label className="mb-1 block text-sm font-semibold text-dark-text-500">
                     Page Name
@@ -98,14 +66,13 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     required
                     placeholder="Name of the page"
                     className="block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500"
-                    value={name}
                     onChange={(e) => {
                       const { value } = e.currentTarget;
                       setName(value);
                     }}
                   />
                 </div>
-                <div className="mb-4">
+                <div className="mb-1">
                   <label className="mb-1 block text-sm font-semibold text-dark-text-500">
                     Set Password
                   </label>
@@ -115,10 +82,21 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     id="password"
                     required
                     placeholder="••••••••"
-                    className={setPasswordClassName}
-                    value={password}
-                    onChange={onPasswordChange}
+                    className={
+                      password === "" || validPassword
+                        ? "block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500 focus:outline-none"
+                        : "block w-full rounded-lg border border-red-500 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:outline-none"
+                    }
+                    onChange={debounce(onPasswordChange, 600)}
                   />
+                </div>
+                <div className="mb-4">
+                  {password !== "" && !validPassword && (
+                    <p className="text-xs italic text-red-500">
+                      Password needs: 8 characters, at least one number, at
+                      least one uppercase and one lowercase letter.
+                    </p>
+                  )}
                 </div>
                 <div className="mb-1">
                   <label className="mb-1 block text-sm font-semibold text-dark-text-500">
@@ -130,9 +108,12 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     id="confirm-password"
                     required
                     placeholder="••••••••"
-                    className={confirmPasswordClassName}
-                    value={confirmPassword}
-                    onChange={onConfirmPasswordChange}
+                    className={
+                      confirmPassword === "" || passwordsMatch
+                        ? "block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500 focus:outline-none"
+                        : "block w-full rounded-lg border border-red-500 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:outline-none"
+                    }
+                    onChange={debounce(onConfirmPasswordChange, 600)}
                     onKeyDown={(e) => {
                       if (disabled || isLoading) return;
                       if (e.key === "Enter") {
@@ -142,7 +123,11 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                   />
                 </div>
                 <div className="mt-1 h-5 w-full max-w-md">
-                  <p className="text-xs italic text-red-500">{error}</p>
+                  {confirmPassword !== "" && !passwordsMatch && (
+                    <p className="text-xs italic text-red-500">
+                      Passwords do not match.
+                    </p>
+                  )}
                 </div>
                 <p className="text-s mt-4 italic text-dark-text-400">
                   This password will be used to decrypt your page, remember it
