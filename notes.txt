@@ -4,6 +4,8 @@ Enable Spend Management for all providers...
 
 Next:
 * migrate to turso
+    - update db schema
+    - do we need to compress documents?
 * create notion flow
 * Fix theme, adjust arrow colors
 * editor does not mean MVP requirements...
