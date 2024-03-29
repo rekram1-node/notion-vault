@@ -1,3 +1,5 @@
+"use client";
+
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/loading";
@@ -151,10 +153,8 @@ const EncryptedDocumentPage = ({
               />
             )}
             {documentData && (
-              // <div className="max-h-[calc(100vh-5rem)] w-full overflow-y-auto">
-              // <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-full overflow-y-auto">
-              // <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-screen overflow-y-auto">
-              <div className="max-h-[calc(100vh-10rem)] min-h-[20rem] w-[1200px] overflow-y-auto">
+              // consider making this smaller in the future?
+              <div className="h-screen w-screen">
                 <Editor
                   editorState={documentData.decryptedContent}
                   documentId={documentId}

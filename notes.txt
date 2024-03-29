@@ -3,19 +3,14 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* migrate to turso
-    - update db schema
-    - do we need to compress documents?
 * create notion flow
-* Fix theme, adjust arrow colors
-* editor does not mean MVP requirements...
+* compression?
 
 Next Levels of Priority:
+* double check editor meets all requirements
 * Finalize theme
 * Do we need any auth with the secret urls?
 * Look Into Notion stuff...
-* Squash these ugly git commits? hahaha
-* find planet scale alternative...
 * Update favicon
 * ensure all editor commands work as expected...
 

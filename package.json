@@ -6,6 +6,7 @@
   "scripts": {
     "build": "next build",
     "db:migrate": "npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migration.sql && turso db shell notion-vault < prisma/migration.sql",
+    "db:local": "turso dev --db-file local/local.db && turso db shell http://127.0.0.1:8080 < prisma/migration.sql",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "next dev",

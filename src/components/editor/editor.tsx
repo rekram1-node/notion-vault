@@ -1,4 +1,6 @@
-import { useCallback } from "react";
+"use client";
+
+import { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { useSnackbar } from "notistack";
 import dynamic from "next/dynamic";
@@ -21,6 +23,7 @@ const Editor = ({
   documentSalt: string;
   iv: string;
 }) => {
+  const [state, setState] = useState(editorState);
   const { enqueueSnackbar } = useSnackbar();
 
   const quillModules = {
@@ -78,10 +81,8 @@ const Editor = ({
   });
 
   const autoSave = async (rawEditorContent: string) => {
+    setState(rawEditorContent);
     try {
-      // const rawEditorContent = JSON.stringify(editorState);
-      console.log(rawEditorContent);
-      return;
       if (true) {
         const documentKey = await deriveDocumentKey(
           passwordString,
@@ -92,7 +93,7 @@ const Editor = ({
           iv,
           documentKey,
         );
-        void mutate({
+        mutate({
           id: documentId,
           encryptedContent,
         });
@@ -110,18 +111,13 @@ const Editor = ({
 
   return (
     <>
-      <div className="w-full">
-        <div className="h-full w-[90vw]">
-          <QuillEditor
-            value={editorState}
-            onChange={onChange}
-            modules={quillModules}
-            formats={quillFormats}
-            // className="mt-10 h-[70%] w-full bg-white"
-            className="mt-10 h-full w-full bg-white"
-          />
-        </div>
-      </div>
+      <QuillEditor
+        value={state}
+        onChange={onChange}
+        modules={quillModules}
+        formats={quillFormats}
+        className="h-full w-full bg-white"
+      />
     </>
   );
 };

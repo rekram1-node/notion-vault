@@ -11,12 +11,11 @@ import "~/styles/globals.css";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const hideNavbarOnRoutes = ["/protected", "/editor"]; // we want to hide navbar for integration renders (at least as of now...)
   return (
     <>
       <ClerkProvider>
         <SnackbarProvider>
-          {!hideNavbarOnRoutes.includes(router.pathname) && <Navbar />}
+          {!router.pathname.includes("/encrypted") && <Navbar />}
           <main className="">{children}</main>
         </SnackbarProvider>
       </ClerkProvider>
