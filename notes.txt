@@ -3,16 +3,14 @@ TODO (in order of priority):
 Enable Spend Management for all providers...
 
 Next:
-* Fix theme, adjust arrow colors
-* fix laggy encrypted document creation << still seems to be some lag with the hook
+* create notion flow
+* compression?
 
 Next Levels of Priority:
+* double check editor meets all requirements
 * Finalize theme
-* Logo Creation
 * Do we need any auth with the secret urls?
 * Look Into Notion stuff...
-* Squash these ugly git commits? hahaha
-* find planet scale alternative...
 * Update favicon
 * ensure all editor commands work as expected...
 
