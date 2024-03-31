@@ -15,7 +15,8 @@ function Layout({ children }: { children: React.ReactNode }) {
     <>
       <ClerkProvider>
         <SnackbarProvider>
-          {!router.pathname.includes("/encrypted") && <Navbar />}
+          {!router.pathname.includes("/encrypted") &&
+            !router.pathname.includes("/editor") && <Navbar />}
           <main className="">{children}</main>
         </SnackbarProvider>
       </ClerkProvider>
