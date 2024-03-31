@@ -1,31 +1,22 @@
-TODO (in order of priority):
+MVP:
+    Functionality needs:
+        - ensure editor works in all edge cases...
+        - update favicon
+        - update theme to be prettier
+        - create notion flow
+        - secret urls?
 
-Enable Spend Management for all providers...
-
-Next:
-* create notion flow
-* compression?
-
-Next Levels of Priority:
-* double check editor meets all requirements
-* Finalize theme
-* Do we need any auth with the secret urls?
-* Look Into Notion stuff...
-* Update favicon
-* ensure all editor commands work as expected...
-
-Buff Editor:
-* fix debounce spams (throttle or debounce autosaving)
-* Show some indication that saving is being done <<
-* Ensure all toolbar actions work (as far as I know link is the only broken thing)
-
-Limitations / Guardrails:
-* Limitations for a user since this is free
-* Limits for # of pages and length of page content?
-* RateLimiting
-* Rate limit page decryption attempts
-* check max password length
-* compressing text content????
+    Guardrails:
+        - spend management for providers?
+        - cloudflare at the front door?
+        - limitations:
+            * # of pages
+            * amount of page content
+            * RateLimiting
+            * password guess spam attacks?
+            * max password length
+            * max page name length
+            * compress page content?
 
 Down the line:
 * setup notion public integration
@@ -33,5 +24,3 @@ Down the line:
 Important:
 * Need to make sure that code merges require permission of at least 1 other person at some point
 * Wait till alpha is complete to do so^
-
-
