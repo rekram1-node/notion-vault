@@ -4,7 +4,7 @@ MVP:
         - update favicon
         - update theme to be prettier
         - create notion flow
-        - secret urls?
+        - speedy load times
 
     Guardrails:
         - spend management for providers?
@@ -20,6 +20,11 @@ MVP:
 
 Down the line:
 * setup notion public integration
+    - investigate webhooks with notion/clerk
+    - perhaps we could create pages for all their
+      pages that are allowed access
+    - uncertain if the integration would have full access
+      rights to do all of this itself
 
 Important:
 * Need to make sure that code merges require permission of at least 1 other person at some point

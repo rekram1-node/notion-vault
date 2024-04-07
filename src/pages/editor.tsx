@@ -37,7 +37,6 @@ export default function Home() {
   ];
 
   const handleEditorChange = (newContent: string) => {
-    console.log(newContent);
     setContent(newContent);
   };
 
