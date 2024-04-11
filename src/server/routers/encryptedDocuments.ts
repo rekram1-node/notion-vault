@@ -2,11 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createSalt } from "~/encryption/encryption";
 import { hashPassword } from "~/encryption/serverEncryption";
-import {
-  createTRPCRouter,
-  privateProcedure,
-  // publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 
 // import { Ratelimit } from "@upstash/ratelimit";
 // import { Redis } from "@upstash/redis";
@@ -129,6 +125,42 @@ export const encryptedDocumentRouter = createTRPCRouter({
       if (!document) throw new TRPCError({ code: "NOT_FOUND" });
     }),
 
+  initialize: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        encryptedContent: z.string(),
+        passwordHash: z.string().min(8),
+        passwordSalt: z.string().min(1),
+        iv: z.string().min(1),
+        documentSalt: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const serverSidePasswordSalt = createSalt();
+      const passwordHash = await hashPassword(
+        input.passwordHash,
+        serverSidePasswordSalt,
+      );
+
+      await ctx.prisma.encryptedDocument.update({
+        where: {
+          userId,
+          id: input.id,
+        },
+        data: {
+          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
+          passwordHash,
+          passwordSalt: input.passwordSalt,
+          serverSidePasswordSalt,
+          iv: input.iv,
+          documentSalt: input.documentSalt,
+          notionPageId: "",
+        },
+      });
+    }),
+
   delete: privateProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -176,6 +208,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
           serverSidePasswordSalt,
           iv: input.iv,
           documentSalt: input.documentSalt,
+          notionPageId: "",
         },
       });
     }),
