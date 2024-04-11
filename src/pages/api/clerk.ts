@@ -1,15 +1,3 @@
-// import { type WebhookEvent } from "@clerk/nextjs/server";
-
-// export async function POST(request: Request) {
-//   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//   const payload: WebhookEvent = await request.json();
-//   console.log(payload);
-// }
-
-// export async function GET() {
-//   return Response.json({ message: "Hello World!" });
-// }
-
 import { type WebhookEvent } from "@clerk/nextjs/server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Notion } from "~/server/notionIntegration";
@@ -65,7 +53,6 @@ async function handleClerkWebhook(
         });
       }
 
-      // read pages...
       const documents = await prisma.encryptedDocument.findMany({
         where: {
           userId,
@@ -116,8 +103,6 @@ async function handleClerkWebhook(
 
 function validSignature(req: NextApiRequest) {
   try {
-    // req.headers.
-    // const headerList = req.headers[""];
     const svixSignature = req.headers["svix-signature"];
     if (!svixSignature) {
       return false;
