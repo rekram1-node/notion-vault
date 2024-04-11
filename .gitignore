@@ -43,3 +43,6 @@ yarn-error.log*
 
 # sqllite
 local/
+
+# misc
+/script.ts

@@ -4,7 +4,7 @@ MVP:
         - update favicon
         - update theme to be prettier
         - create notion flow
-        - secret urls?
+        - speedy load times
 
     Guardrails:
         - spend management for providers?
@@ -18,8 +18,28 @@ MVP:
             * max page name length
             * compress page content?
 
+In order:
+* Create full integration, new sign ups and sign ins should auto create encrypted docs
+  - Adjust encrypted document to default to having no password / handle that case
+  - Ensure Webhook has permissions to do these things - test and iterate
+  - needs to handle cases where insufficient permissions are given...
+  - some easy way for a user to automatically add an encrypted snippet to their
+    notion document from our UI
+  - ...
+* Logging, robust error handling
+* Editor should have a lock icon > forces another password prompt and hides data
+* Prettify
+* Add Guardrails
+* Preformance improvements
+* Documentation, License, TOS, Privacy Policy, purchase domains, etc
+
 Down the line:
 * setup notion public integration
+    - investigate webhooks with notion/clerk
+    - perhaps we could create pages for all their
+      pages that are allowed access
+    - uncertain if the integration would have full access
+      rights to do all of this itself
 
 Important:
 * Need to make sure that code merges require permission of at least 1 other person at some point

@@ -15,6 +15,7 @@ import {
   deriveDocumentKey,
 } from "~/encryption/encryption";
 import Editor from "~/components/editor/editor";
+import CreateForm from "~/components/encryptedDocument/createFormNoClose";
 
 export const getStaticProps = (async (ctx) => {
   const slug = ctx.params?.slug;
@@ -136,11 +137,15 @@ const EncryptedDocumentPage = ({
     <>
       <div className="flex h-screen w-full items-center justify-center overflow-hidden">
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
-          <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
-            <div className="flex flex-grow items-center justify-center pb-10 pt-10">
-              <LoadingSpinner size={60} />
+          isGetSaltDataLoading ? (
+            <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
+              <div className="flex flex-grow items-center justify-center pb-10 pt-10">
+                <LoadingSpinner size={60} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <CreateForm id={documentId} />
+          )
         ) : (
           <>
             {!documentData && (
