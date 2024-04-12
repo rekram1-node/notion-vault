@@ -20,7 +20,6 @@ MVP:
 
 In order:
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
-  - Adjust encrypted document to default to having no password / handle that case
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
   - some easy way for a user to automatically add an encrypted snippet to their
