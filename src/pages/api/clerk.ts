@@ -39,61 +39,71 @@ async function handleClerkWebhook(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const payload: WebhookEvent = JSON.parse(bodyString);
 
-    if (payload.type == "user.created" || payload.type == "session.created") {
-      const userId = payload.data.id;
-      const notion = await Notion.New(userId);
-      if (!notion.isOk) {
-        return res
-          .status(400)
-          .json({ message: `unexpected error: ${notion.error.message}` });
+    let userId = "";
+    if (payload.type == "user.created") {
+      userId = payload.data.id;
+    }
+
+    if (payload.type == "session.created") {
+      userId = payload.data.user_id;
+    }
+
+    if (!userId) {
+      return res.status(400).json({ message: "event is missing user id" });
+    }
+
+    const notion = await Notion.New(userId);
+    if (!notion.isOk) {
+      return res
+        .status(400)
+        .json({ message: `unexpected error: ${notion.error.message}` });
+    }
+
+    const pages = await notion.data.ReadPages();
+    if (!pages.isOk) {
+      return res.status(500).json({
+        message: `failed to read pages for account ${userId}: ${pages.error.message}`,
+      });
+    }
+
+    const documents = await prisma.encryptedDocument.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        notionPageId: true,
+      },
+    });
+
+    for (const page of pages.data) {
+      // check if a page has already been created
+      if (documents.some((document) => document.notionPageId === page.id)) {
+        continue;
       }
 
-      const pages = await notion.data.ReadPages();
-      if (!pages.isOk) {
-        return res.status(500).json({
-          message: `failed to read pages for account ${userId}: ${pages.error.message}`,
-        });
-      }
-
-      const documents = await prisma.encryptedDocument.findMany({
-        where: {
+      const minimalDocument = await prisma.encryptedDocument.create({
+        data: {
           userId,
-        },
-        select: {
-          id: true,
-          notionPageId: true,
+          name: page.name,
+          notionPageId: page.id,
+          encryptedContent: Buffer.from(""),
+          serverSidePasswordSalt: Buffer.from(""),
+          passwordHash: "",
+          documentSalt: "",
+          iv: "",
+          passwordSalt: "",
         },
       });
 
-      for (const page of pages.data) {
-        // check if a page has already been created
-        if (documents.some((document) => document.notionPageId === page.id)) {
-          continue;
-        }
-
-        const minimalDocument = await prisma.encryptedDocument.create({
-          data: {
-            userId,
-            name: page.name,
-            notionPageId: page.id,
-            encryptedContent: Buffer.from(""),
-            serverSidePasswordSalt: Buffer.from(""),
-            passwordHash: "",
-            documentSalt: "",
-            iv: "",
-            passwordSalt: "",
-          },
+      const result = await notion.data.AppendEmbeddedBlock(
+        page.id,
+        minimalDocument.id,
+      );
+      if (!result.isOk) {
+        return res.status(500).json({
+          message: `failed to append embedded block to page ${result.error.message}`,
         });
-
-        const result = await notion.data.AppendEmbeddedBlock(
-          page.id,
-          minimalDocument.id,
-        );
-        if (!result.isOk) {
-          return res.status(500).json({
-            message: `failed to append embedded block to page ${result.error.message}`,
-          });
-        }
       }
     }
 
