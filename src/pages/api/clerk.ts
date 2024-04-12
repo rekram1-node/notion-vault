@@ -104,12 +104,14 @@ async function handleClerkWebhook(
 
 async function validSignature(req: NextApiRequest) {
   try {
-    const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+    const CLERK_WEBHOOK_SIGNING_SECRET =
+      process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
-    if (!WEBHOOK_SECRET) {
-      throw new Error(
-        "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local",
+    if (!CLERK_WEBHOOK_SIGNING_SECRET) {
+      console.error(
+        "Please add CLERK_WEBHOOK_SIGNING_SECRET from Clerk Dashboard to .env",
       );
+      return false;
     }
 
     const svix_id = req.headers["svix-id"] as string;
@@ -123,7 +125,7 @@ async function validSignature(req: NextApiRequest) {
     const body = (await buffer(req)).toString();
 
     // Create a new Svix instance with your secret.
-    const wh = new Webhook(WEBHOOK_SECRET);
+    const wh = new Webhook(CLERK_WEBHOOK_SIGNING_SECRET);
 
     const evt: WebhookEvent = wh.verify(body, {
       "svix-id": svix_id,
