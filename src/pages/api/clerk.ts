@@ -133,22 +133,16 @@ async function validSignature(
     // Create a new Svix instance with your secret.
     const wh = new Webhook(CLERK_WEBHOOK_SIGNING_SECRET);
 
-    const evt: WebhookEvent = wh.verify(body, {
+    wh.verify(body, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
-    }) as WebhookEvent;
-
-    const { id } = evt.data;
-    const eventType = evt.type;
-
-    console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-    console.log("Webhook body:", body);
+    });
 
     return true;
   } catch (e) {
     res.status(400).json({
-      message: `unexpected error: ${String(e)}`,
+      message: `failed to verify webhook event: ${String(e)}`,
     });
     return false;
   }
