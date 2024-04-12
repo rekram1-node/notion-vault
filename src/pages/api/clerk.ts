@@ -33,8 +33,11 @@ async function handleClerkWebhook(
     if (!(await validSignature(req, res))) {
       return;
     }
+
+    const bodyBuffer = await buffer(req);
+    const bodyString = bodyBuffer.toString();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const payload: WebhookEvent = req.body;
+    const payload: WebhookEvent = JSON.parse(bodyString);
 
     if (payload.type == "user.created" || payload.type == "session.created") {
       const userId = payload.data.id;
