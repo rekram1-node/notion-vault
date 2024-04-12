@@ -30,10 +30,8 @@ async function handleClerkWebhook(
   res: NextApiResponse<ResponseData>,
 ) {
   try {
-    if (!(await validSignature(req))) {
-      return res.status(400).json({
-        message: "only valid signed events from clerk will be accepted",
-      });
+    if (!(await validSignature(req, res))) {
+      return;
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const payload: WebhookEvent = req.body;
@@ -102,7 +100,10 @@ async function handleClerkWebhook(
   }
 }
 
-async function validSignature(req: NextApiRequest) {
+async function validSignature(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>,
+) {
   try {
     const CLERK_WEBHOOK_SIGNING_SECRET =
       process.env.CLERK_WEBHOOK_SIGNING_SECRET;
@@ -111,6 +112,9 @@ async function validSignature(req: NextApiRequest) {
       console.error(
         "Please add CLERK_WEBHOOK_SIGNING_SECRET from Clerk Dashboard to .env",
       );
+      res.status(500).json({
+        message: "missing signing secret",
+      });
       return false;
     }
 
@@ -119,11 +123,13 @@ async function validSignature(req: NextApiRequest) {
     const svix_signature = req.headers["svix-signature"] as string;
 
     if (!svix_id || !svix_timestamp || !svix_signature) {
+      res.status(400).json({
+        message: "missing headers",
+      });
       return false;
     }
 
     const body = (await buffer(req)).toString();
-
     // Create a new Svix instance with your secret.
     const wh = new Webhook(CLERK_WEBHOOK_SIGNING_SECRET);
 
@@ -140,7 +146,10 @@ async function validSignature(req: NextApiRequest) {
     console.log("Webhook body:", body);
 
     return true;
-  } catch (_e) {
+  } catch (e) {
+    res.status(400).json({
+      message: `unexpected error: ${String(e)}`,
+    });
     return false;
   }
 }
