@@ -5,6 +5,8 @@ import { Notion } from "~/server/notionIntegration";
 import { prisma } from "~/server/db";
 import { buffer } from "micro";
 
+// turn off default body parser so that webhook
+// signing verification can be properly executed
 export const config = {
   api: {
     bodyParser: false,
@@ -87,8 +89,8 @@ async function handleClerkWebhook(
           userId,
           name: page.name,
           notionPageId: page.id,
-          encryptedContent: Buffer.from(""),
-          serverSidePasswordSalt: Buffer.from(""),
+          encryptedContent: Buffer.from("", "base64"),
+          serverSidePasswordSalt: Buffer.from("", "base64"),
           passwordHash: "",
           documentSalt: "",
           iv: "",

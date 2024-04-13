@@ -144,7 +144,9 @@ const EncryptedDocumentPage = ({
               </div>
             </div>
           ) : (
-            <CreateForm id={documentId} />
+            <div className="h-screen w-screen">
+              <CreateForm id={documentId} />
+            </div>
           )
         ) : (
           <>
