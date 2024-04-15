@@ -17,28 +17,16 @@ export default function EncryptedDocument() {
   const [value, setValue] = useState<JSONContent>(defaultValue);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="flex w-full max-w-xl flex-col gap-6 rounded-md border bg-card p-6">
+    <main className="flex min-h-screen w-full items-center justify-center">
+      <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
         <div className="flex justify-between">
           <h1 className="text-4xl font-semibold"> {title}</h1>
           <ThemeToggle />
         </div>
-        <Editor initialValue={value} onChange={setValue} />
+        <div className="h-screen w-full">
+          <Editor initialValue={value} onChange={setValue} />
+        </div>
       </div>
     </main>
   );
-}
-
-{
-  /* <div className="flex min-h-screen w-full items-center justify-center">
-        <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
-          <div className="flex justify-between">
-            <h1 className="text-4xl font-semibold">{title}</h1>
-            <ThemeToggle />
-          </div>
-          <div className="w-full">
-            <Editor initialValue={value} onChange={setValue} />
-          </div>
-        </div>
-      </div> */
 }

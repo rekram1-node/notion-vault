@@ -19,6 +19,15 @@ import { TextButtons } from "./selectors/text-buttons";
 import { slashCommand, suggestionItems } from "./slashCommand";
 import { Separator } from "~/components/novel/ui/separator";
 
+export const defaultValue: JSONContent = {
+  type: "doc",
+  content: [
+    {
+      type: "paragraph",
+    },
+  ],
+};
+
 const extensions = [...defaultExtensions, slashCommand];
 
 interface EditorProp {

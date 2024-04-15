@@ -12,7 +12,9 @@ import {
   decryptData,
   deriveDocumentKey,
 } from "~/encryption/encryption";
-import Editor from "~/components/editor/editor";
+import Editor from "~/components/novel/editor";
+import { ThemeToggle } from "~/components/novel/themeToggle";
+import { type JSONContent } from "novel";
 import CreateForm from "~/components/encryptedDocument/createFormNoClose";
 
 export const getStaticProps = (async (ctx) => {
@@ -29,6 +31,7 @@ export const getStaticPaths = () => {
 };
 
 interface DocumentData {
+  name: string;
   decryptedContent: string;
   iv: string;
   documentSalt: string;
@@ -41,6 +44,7 @@ const EncryptedDocumentPage = ({
   const { enqueueSnackbar } = useSnackbar();
   const [passwordString, setPasswordString] = useState("");
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
+  const [documentContent, setDocumentContent] = useState<JSONContent>();
 
   const { data: salt, isLoading: isGetSaltDataLoading } =
     api.encryptedDocuments.getBase.useQuery({
@@ -67,10 +71,14 @@ const EncryptedDocumentPage = ({
         documentKey,
       );
       setDocumentData({
+        name: data.name,
         decryptedContent,
         iv: data.iv,
         documentSalt: data.documentSalt,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const content: JSONContent = JSON.parse(decryptedContent);
+      setDocumentContent(content);
     },
     onError: (e) => {
       const errorMessage = e.data?.zodError?.fieldErrors.content;
@@ -133,7 +141,7 @@ const EncryptedDocumentPage = ({
 
   return (
     <>
-      <div className="flex h-screen w-full items-center justify-center overflow-hidden">
+      <main className="flex min-h-screen w-full items-center justify-center">
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
           isGetSaltDataLoading ? (
             <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
@@ -156,20 +164,25 @@ const EncryptedDocumentPage = ({
               />
             )}
             {documentData && (
-              // consider making this smaller in the future?
-              <div className="h-screen w-screen">
-                <Editor
-                  editorState={documentData.decryptedContent}
-                  documentId={documentId}
-                  passwordString={passwordString}
-                  documentSalt={documentData.documentSalt}
-                  iv={documentData.iv}
-                />
+              <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
+                <div className="flex justify-between">
+                  <h1 className="text-4xl font-semibold">
+                    {" "}
+                    {documentData.name}
+                  </h1>
+                  <ThemeToggle />
+                </div>
+                <div className="h-screen w-full">
+                  <Editor
+                    initialValue={documentContent}
+                    onChange={setDocumentContent}
+                  />
+                </div>
               </div>
             )}
           </>
         )}
-      </div>
+      </main>
     </>
   );
 };

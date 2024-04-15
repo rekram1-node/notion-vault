@@ -60,6 +60,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
           userId,
         },
         select: {
+          name: true,
           passwordHash: true,
           encryptedContent: true,
           iv: true,
@@ -94,6 +95,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       const { encryptedContent, iv, documentSalt } = document;
 
       return {
+        name: document.name,
         encryptedContent: encryptedContent.toString("base64"),
         iv,
         documentSalt,
