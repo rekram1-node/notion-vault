@@ -19,6 +19,7 @@ MVP:
             * compress page content?
 
 In order:
+* password initialize page needs to fit small screens
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
