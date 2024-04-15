@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { useSnackbar } from "notistack";

@@ -70,6 +70,18 @@ export const encryptedDocumentRouter = createTRPCRouter({
 
       if (!document) throw new TRPCError({ code: "NOT_FOUND" });
 
+      if (
+        !document.documentSalt ||
+        !document.encryptedContent ||
+        !document.iv ||
+        !document.serverSidePasswordSalt
+      ) {
+        throw new TRPCError({
+          message: "document has not been initialized",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+
       // execute addition hashing for comparison to DB
       const passwordHash = await hashPassword(
         input.hashedPassword,

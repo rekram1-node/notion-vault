@@ -1,59 +1,44 @@
+import Editor from "~/components/novel/editor";
+import { ThemeToggle } from "~/components/novel/themeToggle";
+import { type JSONContent } from "novel";
 import { useState } from "react";
-import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
 
-const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
+export const defaultValue = {
+  type: "doc",
+  content: [
+    {
+      type: "paragraph",
+    },
+  ],
+};
 
-export default function Home() {
-  const [content, setContent] = useState("");
-
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link", "image"],
-      [{ align: [] }],
-      [{ color: [] }],
-      ["code-block"],
-      ["clean"],
-    ],
-  };
-
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "list",
-    "bullet",
-    "link",
-    "image",
-    "align",
-    "color",
-    "code-block",
-  ];
-
-  const handleEditorChange = (newContent: string) => {
-    setContent(newContent);
-  };
+export default function EncryptedDocument() {
+  const title = "SOME TITLE";
+  const [value, setValue] = useState<JSONContent>(defaultValue);
 
   return (
-    <main>
-      <div className="flex h-screen w-screen flex-col items-center">
-        <div className="h-full w-[90vw]">
-          <QuillEditor
-            value={content}
-            onChange={handleEditorChange}
-            modules={quillModules}
-            formats={quillFormats}
-            // className="mt-10 h-[70%] w-full bg-white"
-            className="mt-10 h-full w-full bg-white"
-          />
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="flex w-full max-w-xl flex-col gap-6 rounded-md border bg-card p-6">
+        <div className="flex justify-between">
+          <h1 className="text-4xl font-semibold"> {title}</h1>
+          <ThemeToggle />
         </div>
+        <Editor initialValue={value} onChange={setValue} />
       </div>
     </main>
   );
+}
+
+{
+  /* <div className="flex min-h-screen w-full items-center justify-center">
+        <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
+          <div className="flex justify-between">
+            <h1 className="text-4xl font-semibold">{title}</h1>
+            <ThemeToggle />
+          </div>
+          <div className="w-full">
+            <Editor initialValue={value} onChange={setValue} />
+          </div>
+        </div>
+      </div> */
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/loading";

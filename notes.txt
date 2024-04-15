@@ -19,6 +19,11 @@ MVP:
             * compress page content?
 
 In order:
+* Fully integrate new editor
+  - Fix Theme across the board
+  - Get Editor to take up reasonable amount of the screen off the bat ... preferably the whole thing
+  - Make sure rest of app works as intended
+  - commit & merge
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
