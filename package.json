@@ -55,7 +55,6 @@
     "novel": "^0.2.13",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-quill": "^2.0.0",
     "sonner": "^1.4.41",
     "superjson": "^2.2.1",
     "svix": "^1.21.0",

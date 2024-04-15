@@ -19,11 +19,6 @@ MVP:
             * compress page content?
 
 In order:
-* Fully integrate new editor
-  - Add lock button on editor
-  - Add autosaving text
-  - commit & merge
-
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...

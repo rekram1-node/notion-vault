@@ -13,6 +13,8 @@ import {
   encryptData,
   deriveDocumentKey,
 } from "~/encryption/encryption";
+import { Button } from "~/components/novel/ui/button";
+import { LockOpen1Icon } from "@radix-ui/react-icons";
 import Editor from "~/components/novel/editor";
 import { ThemeToggle } from "~/components/novel/themeToggle";
 import { type JSONContent } from "novel";
@@ -44,6 +46,7 @@ const EncryptedDocumentPage = ({
   const { user } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [passwordString, setPasswordString] = useState("");
+  const [isLocked, setIsLocked] = useState(true);
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
   const [documentContent, setDocumentContent] = useState<JSONContent>();
 
@@ -77,6 +80,7 @@ const EncryptedDocumentPage = ({
         iv: data.iv,
         documentSalt: data.documentSalt,
       });
+      setIsLocked(false);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const content: JSONContent = JSON.parse(decryptedContent);
       setDocumentContent(content);
@@ -205,7 +209,7 @@ const EncryptedDocumentPage = ({
           )
         ) : (
           <>
-            {!documentData && (
+            {isLocked && (
               <PasswordForm
                 formTitle="Your content is locked. Enter your password to continue"
                 inputPlaceholder="Enter Password"
@@ -214,14 +218,24 @@ const EncryptedDocumentPage = ({
                 handlePassword={handlePasswordSubmit}
               />
             )}
-            {documentData && (
+            {!isLocked && documentData && (
               <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <h1 className="text-4xl font-semibold">
-                    {" "}
                     {documentData.name}
                   </h1>
-                  <ThemeToggle />
+                  <div className="flex">
+                    <ThemeToggle />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="ml-2"
+                      onClick={() => setIsLocked(true)}
+                    >
+                      <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
+                      <span className="sr-only">Lock Document</span>
+                    </Button>
+                  </div>
                 </div>
                 <div className="h-screen w-full">
                   <Editor initialValue={documentContent} onChange={autoSave} />
