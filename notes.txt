@@ -26,11 +26,12 @@ In order:
   - some easy way for a user to automatically add an encrypted snippet to their
     notion document from our UI
   - ...
-* Logging, robust error handling
-* Editor should have a lock icon > forces another password prompt and hides data
+
 * Prettify
-* Add Guardrails
 * Preformance improvements
+
+* Logging, robust error handling
+* Add Guardrails
 * Documentation, License, TOS, Privacy Policy, purchase domains, etc
 
 Down the line:

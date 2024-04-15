@@ -60,6 +60,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
           userId,
         },
         select: {
+          name: true,
           passwordHash: true,
           encryptedContent: true,
           iv: true,
@@ -69,6 +70,18 @@ export const encryptedDocumentRouter = createTRPCRouter({
       });
 
       if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+
+      if (
+        !document.documentSalt ||
+        !document.encryptedContent ||
+        !document.iv ||
+        !document.serverSidePasswordSalt
+      ) {
+        throw new TRPCError({
+          message: "document has not been initialized",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
 
       // execute addition hashing for comparison to DB
       const passwordHash = await hashPassword(
@@ -82,6 +95,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       const { encryptedContent, iv, documentSalt } = document;
 
       return {
+        name: document.name,
         encryptedContent: encryptedContent.toString("base64"),
         iv,
         documentSalt,

@@ -1,5 +1,3 @@
-"use client";
-
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/loading";
@@ -12,9 +10,14 @@ import { useSnackbar } from "notistack";
 import {
   hashPassword,
   decryptData,
+  encryptData,
   deriveDocumentKey,
 } from "~/encryption/encryption";
-import Editor from "~/components/editor/editor";
+import { Button } from "~/components/novel/ui/button";
+import { LockOpen1Icon } from "@radix-ui/react-icons";
+import Editor from "~/components/novel/editor";
+import { ThemeToggle } from "~/components/novel/themeToggle";
+import { type JSONContent } from "novel";
 import CreateForm from "~/components/encryptedDocument/createFormNoClose";
 
 export const getStaticProps = (async (ctx) => {
@@ -31,6 +34,7 @@ export const getStaticPaths = () => {
 };
 
 interface DocumentData {
+  name: string;
   decryptedContent: string;
   iv: string;
   documentSalt: string;
@@ -42,7 +46,9 @@ const EncryptedDocumentPage = ({
   const { user } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [passwordString, setPasswordString] = useState("");
+  const [isLocked, setIsLocked] = useState(true);
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
+  const [documentContent, setDocumentContent] = useState<JSONContent>();
 
   const { data: salt, isLoading: isGetSaltDataLoading } =
     api.encryptedDocuments.getBase.useQuery({
@@ -69,10 +75,15 @@ const EncryptedDocumentPage = ({
         documentKey,
       );
       setDocumentData({
+        name: data.name,
         decryptedContent,
         iv: data.iv,
         documentSalt: data.documentSalt,
       });
+      setIsLocked(false);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const content: JSONContent = JSON.parse(decryptedContent);
+      setDocumentContent(content);
     },
     onError: (e) => {
       const errorMessage = e.data?.zodError?.fieldErrors.content;
@@ -133,9 +144,59 @@ const EncryptedDocumentPage = ({
     };
   };
 
+  // ignore loading for now...
+  const { mutate } = api.encryptedDocuments.update.useMutation({
+    onSuccess: () => {
+      // This should really be done "google drive style"
+      // enqueueSnackbar("saved changes", {
+      //   autoHideDuration: 2000,
+      //   variant: "success",
+      // });
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage?.[0]) {
+        enqueueSnackbar(errorMessage[0], {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar("Failed to save page content! Contact Support", {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      }
+    },
+  });
+
+  const autoSave = async (editorJSON: JSONContent) => {
+    setDocumentContent(editorJSON);
+    if (!documentData) return;
+    try {
+      const documentKey = await deriveDocumentKey(
+        passwordString,
+        documentData.documentSalt,
+      );
+      const encryptedContent = await encryptData(
+        JSON.stringify(editorJSON),
+        documentData.iv,
+        documentKey,
+      );
+      mutate({
+        id: documentId,
+        encryptedContent,
+      });
+    } catch (e) {
+      enqueueSnackbar("Failed to autosave: " + String(e), {
+        autoHideDuration: 3000,
+        variant: "error",
+      });
+    }
+  };
+
   return (
     <>
-      <div className="flex h-screen w-full items-center justify-center overflow-hidden">
+      <main className="flex min-h-screen w-full items-center justify-center">
         {isGetSaltDataLoading || !salt?.passwordSalt ? (
           isGetSaltDataLoading ? (
             <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
@@ -150,7 +211,7 @@ const EncryptedDocumentPage = ({
           )
         ) : (
           <>
-            {!documentData && (
+            {isLocked && (
               <PasswordForm
                 formTitle="Your content is locked. Enter your password to continue"
                 inputPlaceholder="Enter Password"
@@ -159,21 +220,33 @@ const EncryptedDocumentPage = ({
                 handlePassword={handlePasswordSubmit}
               />
             )}
-            {documentData && (
-              // consider making this smaller in the future?
-              <div className="h-screen w-screen">
-                <Editor
-                  editorState={documentData.decryptedContent}
-                  documentId={documentId}
-                  passwordString={passwordString}
-                  documentSalt={documentData.documentSalt}
-                  iv={documentData.iv}
-                />
+            {!isLocked && documentData && (
+              <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-4xl font-semibold">
+                    {documentData.name}
+                  </h1>
+                  <div className="flex">
+                    <ThemeToggle />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="ml-2"
+                      onClick={() => setIsLocked(true)}
+                    >
+                      <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
+                      <span className="sr-only">Lock Document</span>
+                    </Button>
+                  </div>
+                </div>
+                <div className="h-screen w-full">
+                  <Editor initialValue={documentContent} onChange={autoSave} />
+                </div>
               </div>
             )}
           </>
         )}
-      </div>
+      </main>
     </>
   );
 };

@@ -8,6 +8,7 @@ import {
 import { api } from "~/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useSnackbar } from "notistack";
+import { defaultValue } from "~/components/novel/editor";
 
 export const useCreateEncryptedDocument = (onSuccess: () => void) => {
   const { user } = useUser();
@@ -55,7 +56,11 @@ export const useCreateEncryptedDocument = (onSuccess: () => void) => {
           passwordString,
           documentSalt,
         );
-        const encryptedData = await encryptData("", iv, documentKey);
+        const encryptedData = await encryptData(
+          JSON.stringify(defaultValue),
+          iv,
+          documentKey,
+        );
         const passwordSalt = createSalt();
         const passwordHash = await hashPassword(passwordString, passwordSalt);
 
