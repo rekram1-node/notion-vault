@@ -10,6 +10,7 @@ import { useSnackbar } from "notistack";
 import {
   hashPassword,
   decryptData,
+  encryptData,
   deriveDocumentKey,
 } from "~/encryption/encryption";
 import Editor from "~/components/novel/editor";
@@ -139,6 +140,56 @@ const EncryptedDocumentPage = ({
     };
   };
 
+  // ignore loading for now...
+  const { mutate } = api.encryptedDocuments.update.useMutation({
+    onSuccess: () => {
+      // This should really be done "google drive style"
+      // enqueueSnackbar("saved changes", {
+      //   autoHideDuration: 2000,
+      //   variant: "success",
+      // });
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage?.[0]) {
+        enqueueSnackbar(errorMessage[0], {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar("Failed to save page content! Contact Support", {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
+      }
+    },
+  });
+
+  const autoSave = async (editorJSON: JSONContent) => {
+    setDocumentContent(editorJSON);
+    if (!documentData) return;
+    try {
+      const documentKey = await deriveDocumentKey(
+        passwordString,
+        documentData.documentSalt,
+      );
+      const encryptedContent = await encryptData(
+        JSON.stringify(editorJSON),
+        documentData.iv,
+        documentKey,
+      );
+      mutate({
+        id: documentId,
+        encryptedContent,
+      });
+    } catch (e) {
+      enqueueSnackbar("Failed to autosave: " + String(e), {
+        autoHideDuration: 3000,
+        variant: "error",
+      });
+    }
+  };
+
   return (
     <>
       <main className="flex min-h-screen w-full items-center justify-center">
@@ -173,10 +224,7 @@ const EncryptedDocumentPage = ({
                   <ThemeToggle />
                 </div>
                 <div className="h-screen w-full">
-                  <Editor
-                    initialValue={documentContent}
-                    onChange={setDocumentContent}
-                  />
+                  <Editor initialValue={documentContent} onChange={autoSave} />
                 </div>
               </div>
             )}

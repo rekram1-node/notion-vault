@@ -9,12 +9,13 @@ import {
   EditorCommandList,
   EditorBubble,
 } from "novel";
+import { debounce } from "lodash";
 import { handleCommandNavigation } from "novel/extensions";
+
 import { defaultExtensions } from "./extensions";
 import { NodeSelector } from "./selectors/node-selector";
 import { LinkSelector } from "./selectors/link-selector";
 import { ColorSelector } from "./selectors/color-selector";
-
 import { TextButtons } from "./selectors/text-buttons";
 import { slashCommand, suggestionItems } from "./slashCommand";
 import { Separator } from "~/components/novel/ui/separator";
@@ -34,10 +35,17 @@ interface EditorProp {
   initialValue?: JSONContent;
   onChange: (value: JSONContent) => void;
 }
+
 const Editor = ({ initialValue, onChange }: EditorProp) => {
   const [openNode, setOpenNode] = useState(false);
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
+
+  const handleChange = (editorJson: JSONContent) => {
+    onChange(editorJson);
+  };
+
+  const debouncedOnChange = debounce(handleChange, 1000);
 
   return (
     <EditorRoot>
@@ -54,7 +62,7 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
           },
         }}
         onUpdate={({ editor }) => {
-          onChange(editor.getJSON());
+          debouncedOnChange(editor.getJSON());
         }}
       >
         <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">

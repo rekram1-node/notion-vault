@@ -20,21 +20,22 @@ MVP:
 
 In order:
 * Fully integrate new editor
-  - Fix Theme across the board
-  - Get Editor to take up reasonable amount of the screen off the bat ... preferably the whole thing
-  - Make sure rest of app works as intended
+  - Add lock button on editor
+  - Add autosaving text
   - commit & merge
+
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
   - some easy way for a user to automatically add an encrypted snippet to their
     notion document from our UI
   - ...
-* Logging, robust error handling
-* Editor should have a lock icon > forces another password prompt and hides data
+
 * Prettify
-* Add Guardrails
 * Preformance improvements
+
+* Logging, robust error handling
+* Add Guardrails
 * Documentation, License, TOS, Privacy Policy, purchase domains, etc
 
 Down the line:
