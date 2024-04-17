@@ -31,7 +31,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
   }),
 
   getBase: privateProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().length(25) }))
     .query(async ({ ctx, input }) => {
       const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
@@ -41,7 +41,11 @@ export const encryptedDocumentRouter = createTRPCRouter({
         },
       });
 
-      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
 
       const { passwordSalt } = document;
 
@@ -51,7 +55,12 @@ export const encryptedDocumentRouter = createTRPCRouter({
     }),
 
   validatePassword: privateProcedure
-    .input(z.object({ id: z.string(), hashedPassword: z.string() }))
+    .input(
+      z.object({
+        id: z.string().length(25),
+        hashedPassword: z.string().length(98),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
@@ -69,7 +78,11 @@ export const encryptedDocumentRouter = createTRPCRouter({
         },
       });
 
-      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
 
       if (
         !document.documentSalt ||
@@ -90,7 +103,10 @@ export const encryptedDocumentRouter = createTRPCRouter({
       );
 
       if (passwordHash !== document.passwordHash)
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "invalid password",
+        });
 
       const { encryptedContent, iv, documentSalt } = document;
 
@@ -103,7 +119,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
     }),
 
   get: privateProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().length(25) }))
     .query(async ({ ctx, input }) => {
       const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
@@ -113,7 +129,11 @@ export const encryptedDocumentRouter = createTRPCRouter({
         },
       });
 
-      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
 
       return document;
     }),
@@ -121,7 +141,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
   update: privateProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().length(25),
         encryptedContent: z.string(),
       }),
     )
@@ -136,18 +156,22 @@ export const encryptedDocumentRouter = createTRPCRouter({
           userId,
         },
       });
-      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
     }),
 
   initialize: privateProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().length(25),
         encryptedContent: z.string(),
-        passwordHash: z.string().min(8),
-        passwordSalt: z.string().min(1),
-        iv: z.string().min(1),
-        documentSalt: z.string().min(1),
+        passwordHash: z.string().length(98),
+        passwordSalt: z.string().length(24),
+        iv: z.string().length(24),
+        documentSalt: z.string().length(24),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -170,13 +194,12 @@ export const encryptedDocumentRouter = createTRPCRouter({
           serverSidePasswordSalt,
           iv: input.iv,
           documentSalt: input.documentSalt,
-          notionPageId: "",
         },
       });
     }),
 
   delete: privateProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().length(25) }))
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
 
@@ -187,7 +210,11 @@ export const encryptedDocumentRouter = createTRPCRouter({
         },
       });
 
-      if (!document) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!document)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
     }),
 
   // We could make this more strict
@@ -196,10 +223,10 @@ export const encryptedDocumentRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1).max(280),
         encryptedContent: z.string(),
-        passwordHash: z.string().min(8),
-        passwordSalt: z.string().min(1),
-        iv: z.string().min(1),
-        documentSalt: z.string().min(1),
+        passwordHash: z.string().length(98),
+        passwordSalt: z.string().length(24),
+        iv: z.string().length(24),
+        documentSalt: z.string().length(24),
       }),
     )
     .mutation(async ({ ctx, input }) => {
