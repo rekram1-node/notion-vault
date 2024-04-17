@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import { PersonIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 
 const Navbar = () => {
@@ -20,26 +21,9 @@ const Navbar = () => {
           </div>
         </Link>
       </div>
-
-      {/* <div className="flex items-center gap-8 text-lg">
-        <Link href="/">
-          <div
-            className={`flex cursor-pointer items-center transition-colors duration-200 ease-in-out hover:text-primary-500 ${isHome() ? "border-b-2 border-primary-500" : ""}`}
-          >
-            Home
-          </div>
-        </Link>
-        <Link href="/settings">
-          <div
-            className={`flex cursor-pointer items-center transition-colors duration-200 ease-in-out hover:text-primary-500 ${isActive("/settings") ? "border-b-2 border-primary-500" : ""}`}
-          >
-            Settings
-          </div>
-        </Link>
-      </div> */}
-
       <div className="flex items-center">
         <UserButton />
+        {/* <PersonIcon width={30} height={30} /> */}
       </div>
     </nav>
   );

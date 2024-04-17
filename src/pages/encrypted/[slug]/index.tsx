@@ -50,21 +50,19 @@ const EncryptedDocumentPage = ({
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
   const [documentContent, setDocumentContent] = useState<JSONContent>();
 
-  const { data: salt, isLoading: isGetSaltDataLoading } =
-    api.encryptedDocuments.getBase.useQuery({
-      id: documentId,
-    });
+  const {
+    data: salt,
+    isLoading: isGetBaseLoading,
+    isError: isGetBaseError,
+  } = api.encryptedDocuments.getBase.useQuery({
+    id: documentId,
+  });
 
   const {
     mutate: validatePasswordMutation,
     isLoading: isValidatePasswordLoading,
   } = api.encryptedDocuments.validatePassword.useMutation({
     onSuccess: async (data) => {
-      enqueueSnackbar("Correct Password, decrypting content...", {
-        //remove this
-        autoHideDuration: 3000,
-        variant: "success",
-      });
       const documentKey = await deriveDocumentKey(
         passwordString,
         data.documentSalt,
@@ -93,13 +91,10 @@ const EncryptedDocumentPage = ({
           variant: "error",
         });
       } else {
-        enqueueSnackbar(
-          "Failed to validate password! Please try again later.",
-          {
-            autoHideDuration: 3000,
-            variant: "error",
-          },
-        );
+        enqueueSnackbar("invalid password", {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
       }
     },
   });
@@ -146,8 +141,8 @@ const EncryptedDocumentPage = ({
 
   // ignore loading for now...
   const { mutate } = api.encryptedDocuments.update.useMutation({
+    // ignore on success for now...
     onSuccess: () => {
-      // This should really be done "google drive style"
       // enqueueSnackbar("saved changes", {
       //   autoHideDuration: 2000,
       //   variant: "success",
@@ -197,51 +192,66 @@ const EncryptedDocumentPage = ({
   return (
     <>
       <main className="flex min-h-screen w-full items-center justify-center">
-        {isGetSaltDataLoading || !salt?.passwordSalt ? (
-          isGetSaltDataLoading ? (
-            <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
-              <div className="flex flex-grow items-center justify-center pb-10 pt-10">
-                <LoadingSpinner size={60} />
-              </div>
+        {isGetBaseLoading && (
+          <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
+            <div className="flex flex-grow items-center justify-center pb-10 pt-10">
+              <LoadingSpinner size={60} />
             </div>
-          ) : (
-            <div className="h-screen w-screen">
-              <CreateForm id={documentId} />
+          </div>
+        )}
+        {!isGetBaseLoading && isGetBaseError && (
+          <div className="w-full max-w-sm rounded-lg border border-gray-300 bg-surface-100 p-6 shadow-lg">
+            <div className="flex flex-grow items-center justify-center p-10">
+              <p className="text-center text-lg font-semibold text-error-dark">
+                Invalid Document Link
+              </p>
             </div>
-          )
-        ) : (
+          </div>
+        )}
+        {!isGetBaseLoading && !isGetBaseError && (
           <>
-            {isLocked && (
-              <PasswordForm
-                formTitle="Your content is locked. Enter your password to continue"
-                inputPlaceholder="Enter Password"
-                submitButtonName="Unlock"
-                isLoading={isValidatePasswordLoading}
-                handlePassword={handlePasswordSubmit}
-              />
-            )}
-            {!isLocked && documentData && (
-              <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
-                <div className="flex items-center justify-between">
-                  <h1 className="text-4xl font-semibold">
-                    {documentData.name}
-                  </h1>
-                  <div className="flex">
-                    <ThemeToggle />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="ml-2"
-                      onClick={() => setIsLocked(true)}
-                    >
-                      <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
-                      <span className="sr-only">Lock Document</span>
-                    </Button>
+            {salt.passwordSalt ? (
+              <>
+                {isLocked && (
+                  <PasswordForm
+                    formTitle="Your content is locked. Enter your password to continue"
+                    inputPlaceholder="Enter Password"
+                    submitButtonName="Unlock"
+                    isLoading={isValidatePasswordLoading}
+                    handlePassword={handlePasswordSubmit}
+                  />
+                )}
+                {!isLocked && documentData && (
+                  <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
+                    <div className="flex items-center justify-between">
+                      <h1 className="text-4xl font-semibold">
+                        {documentData.name}
+                      </h1>
+                      <div className="flex">
+                        <ThemeToggle />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="ml-2"
+                          onClick={() => setIsLocked(true)}
+                        >
+                          <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
+                          <span className="sr-only">Lock Document</span>
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="h-screen w-full">
+                      <Editor
+                        initialValue={documentContent}
+                        onChange={autoSave}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="h-screen w-full">
-                  <Editor initialValue={documentContent} onChange={autoSave} />
-                </div>
+                )}
+              </>
+            ) : (
+              <div className="h-screen w-screen">
+                <CreateForm id={documentId} />
               </div>
             )}
           </>

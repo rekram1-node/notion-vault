@@ -1,6 +1,5 @@
 MVP:
     Functionality needs:
-        - ensure editor works in all edge cases...
         - update favicon
         - update theme to be prettier
         - create notion flow
@@ -19,28 +18,16 @@ MVP:
             * compress page content?
 
 In order:
-* password initialize page needs to fit small screens
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
   - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
   - some easy way for a user to automatically add an encrypted snippet to their
     notion document from our UI
   - ...
-
 * Prettify
 * Preformance improvements
-
-* Logging, robust error handling
 * Add Guardrails
 * Documentation, License, TOS, Privacy Policy, purchase domains, etc
-
-Down the line:
-* setup notion public integration
-    - investigate webhooks with notion/clerk
-    - perhaps we could create pages for all their
-      pages that are allowed access
-    - uncertain if the integration would have full access
-      rights to do all of this itself
 
 Important:
 * Need to make sure that code merges require permission of at least 1 other person at some point
