@@ -65,7 +65,7 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
           debouncedOnChange(editor.getJSON());
         }}
       >
-        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
+        <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border bg-card px-1 py-2 shadow-md transition-all">
           <EditorCommandEmpty className="px-2 text-muted-foreground">
             No results
           </EditorCommandEmpty>
@@ -77,7 +77,7 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
                 className={`flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:bg-accent aria-selected:bg-accent `}
                 key={item.title}
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-muted bg-background">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md border bg-card">
                   {item.icon}
                 </div>
                 <div>

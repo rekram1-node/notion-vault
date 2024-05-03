@@ -45,19 +45,17 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
         onClick={closeModal}
       >
         <div
-          className="rounded-lg bg-secondary-100 p-4 text-surface-50 shadow-lg"
+          className="rounded-lg border bg-card p-4 shadow-lg"
           onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             e.stopPropagation();
           }}
         >
-          <h2 className="text-lg font-bold text-dark-text-500">
-            Create New Protected Page
-          </h2>
+          <h2 className="text-lg font-bold">Create New Protected Page</h2>
           <form className="mt-2 h-auto w-full" style={{ minWidth: "600px" }}>
-            <div className="flexflex-wrap -mx-3 mb-6">
+            <div className="-mx-3 mb-6 flex-wrap">
               <div className="px-3 pt-2">
                 <div className="mb-4">
-                  <label className="mb-1 block text-sm font-semibold text-dark-text-500">
+                  <label className="mb-1 block text-sm font-semibold">
                     Page Name
                   </label>
                   <input
@@ -65,7 +63,7 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     id="name"
                     required
                     placeholder="Name of the page"
-                    className="block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500"
+                    className="block w-full rounded-lg border px-4 py-3 leading-tight"
                     onChange={(e) => {
                       const { value } = e.currentTarget;
                       setName(value);
@@ -73,7 +71,7 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                   />
                 </div>
                 <div className="mb-1">
-                  <label className="mb-1 block text-sm font-semibold text-dark-text-500">
+                  <label className="mb-1 block text-sm font-semibold">
                     Set Password
                   </label>
                   <input
@@ -84,22 +82,22 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     placeholder="••••••••"
                     className={
                       password === "" || validPassword
-                        ? "block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500 focus:outline-none"
-                        : "block w-full rounded-lg border border-red-500 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:outline-none"
+                        ? "block w-full rounded-lg border px-4 py-3 leading-tight"
+                        : "block w-full rounded-lg border border-error-light px-4 py-3 leading-tight focus:outline-none"
                     }
                     onChange={debounce(onPasswordChange, 600)}
                   />
                 </div>
                 <div className="mb-4">
                   {password !== "" && !validPassword && (
-                    <p className="text-xs italic text-red-500">
+                    <p className="text-xs italic text-error-light">
                       Password needs: 8 characters, at least one number, at
                       least one uppercase and one lowercase letter.
                     </p>
                   )}
                 </div>
                 <div className="mb-1">
-                  <label className="mb-1 block text-sm font-semibold text-dark-text-500">
+                  <label className="mb-1 block text-sm font-semibold">
                     Confirm password
                   </label>
                   <input
@@ -110,8 +108,8 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                     placeholder="••••••••"
                     className={
                       confirmPassword === "" || passwordsMatch
-                        ? "block w-full rounded-lg border border-dark-text-200 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:border-primary-500 focus:outline-none"
-                        : "block w-full rounded-lg border border-red-500 bg-dark-text-100 px-4 py-3 leading-tight text-dark-text-500 focus:outline-none"
+                        ? "block w-full rounded-lg border px-4 py-3 leading-tight"
+                        : "block w-full rounded-lg border border-error-light px-4 py-3 leading-tight focus:outline-none"
                     }
                     onChange={debounce(onConfirmPasswordChange, 600)}
                     onKeyDown={(e) => {
@@ -124,26 +122,26 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                 </div>
                 <div className="mt-1 h-5 w-full max-w-md">
                   {confirmPassword !== "" && !passwordsMatch && (
-                    <p className="text-xs italic text-red-500">
+                    <p className="text-xs italic text-error-light">
                       Passwords do not match.
                     </p>
                   )}
                 </div>
-                <p className="text-s mt-4 italic text-dark-text-400">
+                <p className="text-s mt-4 italic text-secondary">
                   This password will be used to decrypt your page, remember it
                 </p>
               </div>
             </div>
           </form>
-          <div className="mt-4 flex justify-end space-x-2">
+          <div className="mt-4 flex justify-end space-x-2 font-semibold">
             <button
-              className={`rounded bg-error-light px-4 py-2 hover:bg-error-normal`}
+              className={"rounded bg-error-light px-4 py-2 hover:brightness-75"}
               onClick={closeModal}
             >
               Cancel
             </button>
             <button
-              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700 ${disabled || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+              className={`rounded bg-primary px-4 py-2 hover:brightness-75 ${disabled || isLoading ? "cursor-not-allowed opacity-20" : ""}`}
               onClick={async () => mutate(name, password)}
               disabled={disabled || isLoading}
             >

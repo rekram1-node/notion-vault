@@ -6,6 +6,7 @@ import {
   OpenInNewWindowIcon,
   CopyIcon,
   TrashIcon,
+  FileTextIcon,
 } from "@radix-ui/react-icons";
 import Modal from "../modal";
 
@@ -61,7 +62,7 @@ const EncryptedDocumentItem = ({
 
   const onCopy = () => {
     void navigator.clipboard.writeText(link);
-    enqueueSnackbar(`Copied ${document.name} url to clipboard`, {
+    enqueueSnackbar(`Copied url to clipboard`, {
       autoHideDuration: 3000,
       variant: "info",
     });
@@ -69,17 +70,17 @@ const EncryptedDocumentItem = ({
 
   return (
     <>
-      <div className="flex items-center justify-center text-surface-50">
-        <div className="relative mt-2 flex w-5/6 flex-col items-center rounded-xl bg-primary-500 shadow-md">
+      <div className="flex items-center justify-center">
+        <div className="relative mt-4 flex w-full flex-col items-center rounded-xl border-2 bg-card shadow-md">
           <div className="w-full">
-            <div className="card variant-glass flex items-center justify-between p-4">
-              <h5 className="h5 font-sans text-xl font-bold">
-                {document.name}
-              </h5>
-              <div className="flex items-center">
+            <div className="card variant-glass flex items-center justify-start p-6">
+              <FileTextIcon className="mr-4 h-6 w-6" />
+              <h5 className="h5 text-xl">{document.name}</h5>
+              <div className="ml-auto flex items-center space-x-3">
                 <button
-                  className="mr-2 flex items-center justify-center rounded-full bg-primary-500 text-surface-50"
+                  className="mr-1"
                   onClick={onCopy}
+                  title="Copy protected page url to clipboard"
                 >
                   <CopyIcon className="h-6 w-6" />
                 </button>
@@ -87,13 +88,15 @@ const EncryptedDocumentItem = ({
                   href={link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-full bg-primary-500 text-surface-50"
+                  className=""
+                  title="Open protected page in new tab"
                 >
                   <OpenInNewWindowIcon className="h-6 w-6" />
                 </Link>
                 <button
-                  className="mr-2 flex items-center justify-center rounded-full bg-primary-500 text-surface-50"
+                  className=""
                   onClick={() => setIsDeleteModalVisible(true)}
+                  title="Delete protected page"
                 >
                   <TrashIcon className="h-6 w-6" />
                 </button>
@@ -106,9 +109,7 @@ const EncryptedDocumentItem = ({
         <Modal
           title="Confirm Deletion"
           content={
-            <p className="text-dark-text-500">
-              Are you sure you want to delete {document.name}?
-            </p>
+            <p className="">Are you sure you want to delete {document.name}?</p>
           }
           isLoading={isDeleteLoading}
           onCancel={() => setIsDeleteModalVisible(false)}

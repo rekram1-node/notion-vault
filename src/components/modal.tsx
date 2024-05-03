@@ -30,20 +30,20 @@ const Modal = ({
         onClick={onCancel}
       >
         <div
-          className="rounded-lg bg-secondary-100 p-4 text-surface-50 shadow-lg"
+          className="rounded-lg border bg-background p-4 shadow-lg"
           onClick={handleModalClick}
         >
-          <h2 className="text-lg font-bold text-dark-text-500">{title}</h2>
+          <h2 className="text-lg font-bold">{title}</h2>
           {content}
           <div className="mt-4 flex justify-end space-x-2">
             <button
-              className={`rounded bg-primary-500 px-4 py-2 hover:bg-primary-700`}
+              className={`rounded bg-primary px-4 py-2 hover:brightness-75`}
               onClick={onCancel}
             >
               Cancel
             </button>
             <button
-              className={`rounded bg-error-light px-4 py-2 hover:bg-error-normal`}
+              className={`rounded bg-error-light px-4 py-2 hover:brightness-75`}
               onClick={onConfirm}
             >
               {!isLoading ? actionTxt : <LoadingSpinner />}
