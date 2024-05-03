@@ -1,3 +1,4 @@
+"use client";
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/loading";
@@ -14,7 +15,7 @@ import {
   deriveDocumentKey,
 } from "~/encryption/encryption";
 import { Button } from "~/components/novel/ui/button";
-import { LockOpen1Icon } from "@radix-ui/react-icons";
+import { LockClosedIcon, LockOpen1Icon } from "@radix-ui/react-icons";
 import Editor from "~/components/novel/editor";
 import { ThemeToggle } from "~/components/novel/themeToggle";
 import { type JSONContent } from "novel";
@@ -49,6 +50,7 @@ const EncryptedDocumentPage = ({
   const [isLocked, setIsLocked] = useState(true);
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
   const [documentContent, setDocumentContent] = useState<JSONContent>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     data: salt,
@@ -78,12 +80,14 @@ const EncryptedDocumentPage = ({
         iv: data.iv,
         documentSalt: data.documentSalt,
       });
+      setIsLoading(false);
       setIsLocked(false);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const content: JSONContent = JSON.parse(decryptedContent);
       setDocumentContent(content);
     },
     onError: (e) => {
+      setIsLoading(false);
       const errorMessage = e.data?.zodError?.fieldErrors.content;
       if (errorMessage?.[0]) {
         enqueueSnackbar(errorMessage[0], {
@@ -99,6 +103,7 @@ const EncryptedDocumentPage = ({
     },
   });
 
+  // need to adjust loading here
   const handlePasswordSubmit = async (
     password: string,
   ): Promise<PasswordSubmitResult> => {
@@ -111,12 +116,17 @@ const EncryptedDocumentPage = ({
       }
 
       if (password.length === 0) {
+        enqueueSnackbar("invalid password", {
+          autoHideDuration: 3000,
+          variant: "error",
+        });
         return {
           valid: false,
-          errMsg: "Invalid Password",
+          errMsg: "",
         };
       }
 
+      setIsLoading(true);
       setPasswordString(user?.id + password);
       const passwordHash = await hashPassword(
         user?.id + password,
@@ -190,74 +200,75 @@ const EncryptedDocumentPage = ({
   };
 
   return (
-    <>
-      <main className="flex min-h-screen w-full items-center justify-center">
-        {isGetBaseLoading && (
-          <div className="w-full max-w-sm rounded-lg bg-surface-100 p-6 shadow-lg">
-            <div className="flex flex-grow items-center justify-center pb-10 pt-10">
-              <LoadingSpinner size={60} />
-            </div>
+    <div className="flex h-full items-center justify-center">
+      {isGetBaseLoading && (
+        <div className="flex h-full w-full items-center justify-center">
+          <div className="bg-surface-100 flex max-w-sm justify-center rounded-lg p-6 shadow-lg">
+            <LoadingSpinner size={60} />
           </div>
-        )}
-        {!isGetBaseLoading && isGetBaseError && (
-          <div className="w-full max-w-sm rounded-lg border border-gray-300 bg-surface-100 p-6 shadow-lg">
-            <div className="flex flex-grow items-center justify-center p-10">
-              <p className="text-center text-lg font-semibold text-error-dark">
-                Invalid Document Link
-              </p>
+        </div>
+      )}
+      {!isGetBaseLoading && (
+        <>
+          {isGetBaseError ? (
+            <div className="flex h-full w-full items-center justify-center">
+              Invalid Document Link
             </div>
-          </div>
-        )}
-        {!isGetBaseLoading && !isGetBaseError && (
-          <>
-            {salt.passwordSalt ? (
-              <>
-                {isLocked && (
-                  <PasswordForm
-                    formTitle="Your content is locked. Enter your password to continue"
-                    inputPlaceholder="Enter Password"
-                    submitButtonName="Unlock"
-                    isLoading={isValidatePasswordLoading}
-                    handlePassword={handlePasswordSubmit}
-                  />
-                )}
-                {!isLocked && documentData && (
-                  <div className="flex max-h-screen w-screen flex-col gap-6 overflow-auto rounded-md border bg-card p-6">
-                    <div className="flex items-center justify-between">
-                      <h1 className="text-4xl font-semibold">
-                        {documentData.name}
-                      </h1>
-                      <div className="flex">
-                        <ThemeToggle />
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="ml-2"
-                          onClick={() => setIsLocked(true)}
-                        >
-                          <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
-                          <span className="sr-only">Lock Document</span>
-                        </Button>
+          ) : (
+            <>
+              {salt.passwordSalt ? (
+                <>
+                  {isLocked && (
+                    <div className="flex w-1/2 flex-col items-center justify-start pt-2">
+                      <LockClosedIcon className="mb-5" height={48} width={48} />
+                      <div className="pb-5 text-center text-lg">
+                        <p className="">Your content is locked. Verify your</p>
+                        <p className="">password to continue.</p>
                       </div>
-                    </div>
-                    <div className="h-screen w-full">
-                      <Editor
-                        initialValue={documentContent}
-                        onChange={autoSave}
+                      <PasswordForm
+                        inputPlaceholder="Enter Password"
+                        submitButtonName="Unlock"
+                        isLoading={isValidatePasswordLoading || isLoading}
+                        handlePassword={handlePasswordSubmit}
                       />
                     </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="h-screen w-screen">
+                  )}
+                  {!isLocked && documentData && (
+                    <div className="flex h-full w-screen flex-col gap-6 rounded-md bg-background p-6 pb-10">
+                      <div className="flex items-center justify-between">
+                        <h1 className="text-4xl font-semibold">
+                          {documentData.name}
+                        </h1>
+                        <div className="flex">
+                          <ThemeToggle />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="ml-2"
+                            onClick={() => setIsLocked(true)}
+                          >
+                            <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
+                            <span className="sr-only">Lock Document</span>
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="">
+                        <Editor
+                          initialValue={documentContent}
+                          onChange={autoSave}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
                 <CreateForm id={documentId} />
-              </div>
-            )}
-          </>
-        )}
-      </main>
-    </>
+              )}
+            </>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

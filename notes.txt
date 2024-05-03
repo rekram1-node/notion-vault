@@ -25,7 +25,10 @@ In order:
     notion document from our UI
   - ...
 * Prettify
+  - Maybe - Adjust the top padding we see on the encrypted pages
+
 * Preformance improvements
+  - investigate any remaining areas with lag
 * Add Guardrails
 * Documentation, License, TOS, Privacy Policy, purchase domains, etc
 
