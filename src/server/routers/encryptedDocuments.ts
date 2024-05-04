@@ -43,7 +43,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
 
       if (!document)
         throw new TRPCError({
-          code: "NOT_FOUND",
+          code: "NOT_FOUND", // error code is used by frontend
           message: "document does not exist",
         });
 
