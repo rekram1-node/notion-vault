@@ -56,6 +56,7 @@ const EncryptedDocumentPage = ({
     data: salt,
     isLoading: isGetBaseLoading,
     isError: isGetBaseError,
+    error: getBaseError,
   } = api.encryptedDocuments.getBase.useQuery({
     id: documentId,
   });
@@ -210,13 +211,13 @@ const EncryptedDocumentPage = ({
       )}
       {!isGetBaseLoading && (
         <>
-          {isGetBaseError ? (
+          {isGetBaseError && getBaseError.data?.code === "NOT_FOUND" ? (
             <div className="flex h-full w-full items-center justify-center">
               Invalid Document Link
             </div>
           ) : (
             <>
-              {salt.passwordSalt ? (
+              {salt?.passwordSalt ? (
                 <>
                   {isLocked && (
                     <div className="flex w-1/2 flex-col items-center justify-start pt-2">
