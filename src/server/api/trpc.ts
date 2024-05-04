@@ -85,6 +85,7 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.userId) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
+      message: "Missing userId in context...",
     });
   }
 
