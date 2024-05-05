@@ -26,7 +26,7 @@ import { prisma } from "~/server/db";
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req } = opts;
   const sesh = getAuth(req);
-  const userId = sesh.userId ?? "";
+  const userId = sesh.userId;
 
   return {
     prisma,
@@ -40,19 +40,19 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * This is where the tRPC API is initialized, connecting the context and transformer.
  */
 import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
+import { transformer } from "./transformer";
 import { getAuth } from "@clerk/nextjs/server";
 import { ZodError } from "zod";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer: superjson,
+  transformer,
   errorFormatter({ shape, error }) {
     return {
       ...shape,
       data: {
         ...shape.data,
         zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+          error?.cause instanceof ZodError ? error?.cause?.flatten() : null,
       },
     };
   },

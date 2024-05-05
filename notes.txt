@@ -27,7 +27,6 @@ In order:
 * UX
   - once a page is initialized it should send you straight to editor rather than having to 
     re-enter password
-  - delay when typing in the editor...
   - cookies aren't being attached to requests when accessed through notion...
 * 
 * Prettify
