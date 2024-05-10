@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   EditorRoot,
   EditorCommand,
@@ -41,11 +41,11 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
 
-  const handleChange = (editorJson: JSONContent) => {
-    onChange(editorJson);
-  };
-
-  const debouncedOnChange = debounce(handleChange, 1000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedOnChange = useCallback(
+    debounce((value: JSONContent) => onChange(value), 1000),
+    [onChange],
+  );
 
   return (
     <EditorRoot>
@@ -61,9 +61,7 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
             class: `prose prose-lg dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full`,
           },
         }}
-        onUpdate={({ editor }) => {
-          debouncedOnChange(editor.getJSON());
-        }}
+        onUpdate={({ editor }) => debouncedOnChange(editor.getJSON())}
       >
         <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border bg-card px-1 py-2 shadow-md transition-all">
           <EditorCommandEmpty className="px-2 text-muted-foreground">
