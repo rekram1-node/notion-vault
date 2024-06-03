@@ -1,9 +1,9 @@
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import EncryptedDocumentItem from "~/components/encryptedDocument/encryptedDocumentItem";
+import EncryptedDocument from "~/components/encryptedDocument/encryptedDocument";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import { LoadingSpinner } from "~/components/loading";
 import CreateForm from "~/components/encryptedDocument/createForm";
+import EncryptedDocumentSkeleton from "~/components/encryptedDocument/encryptedDocumentSkeleton";
 
 const Home = () => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
@@ -23,18 +23,16 @@ const Home = () => {
               <PlusCircledIcon className="h-10 w-10 rounded-full bg-primary text-accent hover:brightness-75" />
             </button>
           </div>
-
-          {isLoading && (
-            <div className="flex flex-grow items-center justify-center pt-28">
-              <LoadingSpinner size={60} />
-            </div>
-          )}
+          {isLoading &&
+            Array.from({ length: 3 }).map((_, index) => (
+              <EncryptedDocumentSkeleton key={index} />
+            ))}
           {!isLoading && (
             <div>
               {documents && documents.length > 0 ? (
                 <div>
                   {documents.map((document, index) => (
-                    <EncryptedDocumentItem key={index} document={document} />
+                    <EncryptedDocument key={index} document={document} />
                   ))}
                 </div>
               ) : (

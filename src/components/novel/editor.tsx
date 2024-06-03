@@ -43,7 +43,7 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedOnChange = useCallback(
-    debounce((value: JSONContent) => onChange(value), 1000),
+    debounce((value: JSONContent) => onChange(value), 2000),
     [onChange],
   );
 
