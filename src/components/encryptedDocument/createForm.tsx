@@ -89,12 +89,12 @@ const CreateForm = ({ onClose }: { onClose: () => void }) => {
                   />
                 </div>
                 <div className="mb-4">
-                  {password !== "" && !validPassword && (
-                    <p className="text-xs italic text-error-light">
-                      Password needs: 8 characters, at least one number, at
-                      least one uppercase and one lowercase letter.
-                    </p>
-                  )}
+                  <p
+                    className={`text-xs italic text-error-light ${(password === "" || validPassword) && "text-transparent"}`}
+                  >
+                    Password needs: 8 characters, at least one number, at least
+                    one uppercase and one lowercase letter.
+                  </p>
                 </div>
                 <div className="mb-1">
                   <label className="mb-1 block text-sm font-semibold">

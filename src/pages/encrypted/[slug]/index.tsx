@@ -6,7 +6,6 @@ import PasswordForm, {
   type PasswordSubmitResult,
 } from "~/components/passwordForm";
 import { api } from "~/utils/api";
-import { useUser } from "@clerk/nextjs";
 import { useSnackbar } from "notistack";
 import {
   hashPassword,
@@ -44,7 +43,6 @@ interface DocumentData {
 const EncryptedDocumentPage = ({
   documentId,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { user } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [passwordString, setPasswordString] = useState("");
   const [isLocked, setIsLocked] = useState(true);
@@ -128,11 +126,8 @@ const EncryptedDocumentPage = ({
       }
 
       setIsLoading(true);
-      setPasswordString(user?.id + password);
-      const passwordHash = await hashPassword(
-        user?.id + password,
-        salt.passwordSalt,
-      );
+      setPasswordString(password);
+      const passwordHash = await hashPassword(password, salt.passwordSalt);
 
       validatePasswordMutation({
         id: documentId,
