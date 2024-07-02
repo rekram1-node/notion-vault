@@ -15,11 +15,7 @@ export interface EncryptedDocument {
   name: string;
 }
 
-const EncryptedDocumentItem = ({
-  document,
-}: {
-  document: EncryptedDocument;
-}) => {
+const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [baseUrl, setBaseUrl] = useState("");
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -120,4 +116,4 @@ const EncryptedDocumentItem = ({
   );
 };
 
-export default EncryptedDocumentItem;
+export default EncryptedDocument;

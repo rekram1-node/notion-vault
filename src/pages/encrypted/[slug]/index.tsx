@@ -6,7 +6,6 @@ import PasswordForm, {
   type PasswordSubmitResult,
 } from "~/components/passwordForm";
 import { api } from "~/utils/api";
-import { useUser } from "@clerk/nextjs";
 import { useSnackbar } from "notistack";
 import {
   hashPassword,
@@ -44,13 +43,13 @@ interface DocumentData {
 const EncryptedDocumentPage = ({
   documentId,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { user } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [passwordString, setPasswordString] = useState("");
   const [isLocked, setIsLocked] = useState(true);
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
   const [documentContent, setDocumentContent] = useState<JSONContent>();
   const [isLoading, setIsLoading] = useState(false);
+  const [documentKey, setDocumentKey] = useState<Buffer | undefined>();
 
   const {
     data: salt,
@@ -128,11 +127,8 @@ const EncryptedDocumentPage = ({
       }
 
       setIsLoading(true);
-      setPasswordString(user?.id + password);
-      const passwordHash = await hashPassword(
-        user?.id + password,
-        salt.passwordSalt,
-      );
+      setPasswordString(password);
+      const passwordHash = await hashPassword(password, salt.passwordSalt);
 
       validatePasswordMutation({
         id: documentId,
@@ -176,17 +172,22 @@ const EncryptedDocumentPage = ({
   });
 
   const autoSave = async (editorJSON: JSONContent) => {
-    setDocumentContent(editorJSON);
     if (!documentData) return;
     try {
-      const documentKey = await deriveDocumentKey(
-        passwordString,
-        documentData.documentSalt,
-      );
+      let key: Buffer;
+      if (!documentKey) {
+        key = await deriveDocumentKey(
+          passwordString,
+          documentData.documentSalt,
+        );
+        setDocumentKey(key);
+      } else {
+        key = documentKey;
+      }
       const encryptedContent = await encryptData(
         JSON.stringify(editorJSON),
         documentData.iv,
-        documentKey,
+        key,
       );
       mutate({
         id: documentId,
