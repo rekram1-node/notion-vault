@@ -49,6 +49,7 @@ const EncryptedDocumentPage = ({
   const [documentData, setDocumentData] = useState<DocumentData | undefined>();
   const [documentContent, setDocumentContent] = useState<JSONContent>();
   const [isLoading, setIsLoading] = useState(false);
+  const [documentKey, setDocumentKey] = useState<Buffer | undefined>();
 
   const {
     data: salt,
@@ -171,17 +172,22 @@ const EncryptedDocumentPage = ({
   });
 
   const autoSave = async (editorJSON: JSONContent) => {
-    setDocumentContent(editorJSON);
     if (!documentData) return;
     try {
-      const documentKey = await deriveDocumentKey(
-        passwordString,
-        documentData.documentSalt,
-      );
+      let key: Buffer;
+      if (!documentKey) {
+        key = await deriveDocumentKey(
+          passwordString,
+          documentData.documentSalt,
+        );
+        setDocumentKey(key);
+      } else {
+        key = documentKey;
+      }
       const encryptedContent = await encryptData(
         JSON.stringify(editorJSON),
         documentData.iv,
-        documentKey,
+        key,
       );
       mutate({
         id: documentId,
