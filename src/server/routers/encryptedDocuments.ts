@@ -2,11 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createSalt } from "~/encryption/encryption";
 import { hashPassword } from "~/encryption/serverEncryption";
-import {
-  createTRPCRouter,
-  privateProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 
 // import { Ratelimit } from "@upstash/ratelimit";
 // import { Redis } from "@upstash/redis";
@@ -34,12 +30,14 @@ export const encryptedDocumentRouter = createTRPCRouter({
     return documents;
   }),
 
-  getBase: publicProcedure
+  getBase: privateProcedure
     .input(z.object({ id: z.string().length(25) }))
     .query(async ({ ctx, input }) => {
+      const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
         where: {
           id: input.id,
+          userId,
         },
       });
 
@@ -56,7 +54,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       };
     }),
 
-  validatePassword: publicProcedure
+  validatePassword: privateProcedure
     .input(
       z.object({
         id: z.string().length(25),
@@ -64,9 +62,11 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
         where: {
           id: input.id,
+          userId,
         },
         select: {
           name: true,
@@ -118,12 +118,14 @@ export const encryptedDocumentRouter = createTRPCRouter({
       };
     }),
 
-  get: publicProcedure
+  get: privateProcedure
     .input(z.object({ id: z.string().length(25) }))
     .query(async ({ ctx, input }) => {
+      const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.findUnique({
         where: {
           id: input.id,
+          userId,
         },
       });
 
@@ -136,7 +138,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       return document;
     }),
 
-  update: publicProcedure
+  update: privateProcedure
     .input(
       z.object({
         id: z.string().length(25),
@@ -144,12 +146,14 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
       const document = await ctx.prisma.encryptedDocument.update({
         data: {
           encryptedContent: Buffer.from(input.encryptedContent, "base64"),
         },
         where: {
           id: input.id,
+          userId,
         },
       });
       if (!document)
@@ -159,7 +163,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
         });
     }),
 
-  initialize: publicProcedure
+  initialize: privateProcedure
     .input(
       z.object({
         id: z.string().length(25),
@@ -171,6 +175,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
       const serverSidePasswordSalt = createSalt();
       const passwordHash = await hashPassword(
         input.passwordHash,
@@ -179,6 +184,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
 
       const document = await ctx.prisma.encryptedDocument.update({
         where: {
+          userId,
           id: input.id,
         },
         data: {

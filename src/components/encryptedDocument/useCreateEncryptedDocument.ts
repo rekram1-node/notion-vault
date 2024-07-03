@@ -6,10 +6,12 @@ import {
   hashPassword,
 } from "~/encryption/encryption";
 import { api } from "~/utils/api";
+import { useUser } from "@clerk/nextjs";
 import { useSnackbar } from "notistack";
 import { defaultValue } from "~/components/novel/editor";
 
 export const useCreateEncryptedDocument = (onSuccess: () => void) => {
+  const { user } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const utils = api.useUtils();
   const [loading, setLoading] = useState(false);
@@ -46,17 +48,21 @@ export const useCreateEncryptedDocument = (onSuccess: () => void) => {
   const mutate = useCallback(
     async (name: string, password: string) => {
       setLoading(true);
+      const passwordString = user?.id + password;
       try {
         const documentSalt = createSalt();
         const iv = createSalt();
-        const documentKey = await deriveDocumentKey(password, documentSalt);
+        const documentKey = await deriveDocumentKey(
+          passwordString,
+          documentSalt,
+        );
         const encryptedData = await encryptData(
           JSON.stringify(defaultValue),
           iv,
           documentKey,
         );
         const passwordSalt = createSalt();
-        const passwordHash = await hashPassword(password, passwordSalt);
+        const passwordHash = await hashPassword(passwordString, passwordSalt);
 
         createPageMutate({
           name,
