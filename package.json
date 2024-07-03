@@ -17,7 +17,7 @@
   "dependencies": {
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
-    "@clerk/nextjs": "^4.31.3",
+    "@clerk/nextjs": "^5.2.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@libsql/client": "^0.5.6",

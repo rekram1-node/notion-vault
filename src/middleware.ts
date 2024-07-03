@@ -1,11 +1,17 @@
-import { authMiddleware } from "@clerk/nextjs";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// This example protects all routes including api/trpc routes
-// Please edit this to allow other routes to be public as needed.
-// See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your Middleware
-export default authMiddleware({
-  // eventually we will kill off the /editor route since it is for development purposes exclusively...
-  publicRoutes: ["/editor", "/api/clerk", "/protected(.*)"],
+const isProtectedRoute = createRouteMatcher(["/"]);
+
+// // This example protects all routes including api/trpc routes
+// // Please edit this to allow other routes to be public as needed.
+// // See https://clerk.com/docs/references/nextjs/clerk-middleware for more information about configuring your Middleware
+export default clerkMiddleware((auth, req) => {
+  if (isProtectedRoute(req)) {
+    auth().protect();
+  }
 });
 
 export const config = {

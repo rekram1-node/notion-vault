@@ -25,15 +25,7 @@ import { prisma } from "~/server/db";
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req } = opts;
-  let userId;
-
-  try {
-    const sesh = getAuth(req);
-    userId = sesh.userId;
-  } catch (_e) {
-    // intentionally left empty... this should only throw errors
-    // if the user isn't authenticated (ie a public route)
-  }
+  const userId = getAuth(req).userId;
 
   return {
     prisma,
