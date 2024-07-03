@@ -1,5 +1,5 @@
 import { type SearchPagesResponse } from "~/server/types/notion";
-import { clerkClient } from "@clerk/nextjs";
+import { clerkClient } from "@clerk/nextjs/server";
 import { type Result, ok, error } from "~/server/types/result";
 import { api } from "~/server/utils";
 
@@ -91,14 +91,14 @@ const provider = "oauth_notion";
 
 const readNotionToken = async (userId: string): Promise<Result<string>> => {
   try {
-    const response = await clerkClient.users.getUserOauthAccessToken(
-      userId,
-      provider,
-    );
-    if (response.length === 0) {
+    const { data, totalCount } =
+      await clerkClient().users.getUserOauthAccessToken(userId, provider);
+
+    if (totalCount === 0 || data.length === 0) {
       return error(new Error("failed to read token, empty response"));
     }
-    const oauth = response[0];
+
+    const oauth = data[0];
     if (!oauth?.token) {
       return error(
         new Error(`response doesn't contain token: ${JSON.stringify(oauth)}`),
