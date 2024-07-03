@@ -177,7 +177,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
         serverSidePasswordSalt,
       );
 
-      await ctx.prisma.encryptedDocument.update({
+      const document = await ctx.prisma.encryptedDocument.update({
         where: {
           id: input.id,
         },
@@ -190,6 +190,13 @@ export const encryptedDocumentRouter = createTRPCRouter({
           documentSalt: input.documentSalt,
         },
       });
+
+      return {
+        name: document.name,
+        decryptedContent: "",
+        iv: input.iv,
+        documentSalt: input.documentSalt,
+      };
     }),
 
   delete: privateProcedure

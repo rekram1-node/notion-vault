@@ -31,7 +31,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             <div
               className={"h-screen bg-background pt-16 font-sans antialiased"}
             >
-              {!router.pathname.includes("/encrypted") && <Navbar />}
+              {!router.pathname.includes("/protected") && <Navbar />}
               {children}
             </div>
           </main>

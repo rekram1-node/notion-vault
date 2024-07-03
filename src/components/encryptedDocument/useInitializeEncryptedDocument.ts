@@ -8,20 +8,22 @@ import {
 import { api } from "~/utils/api";
 import { useSnackbar } from "notistack";
 import { defaultValue } from "~/components/novel/editor";
+import { type DocumentData } from "~/types/DocumentData";
 
 export const useInitializeEncryptedDocument = (
   id: string,
-  onSuccess: () => void,
+  onCreation: (data: DocumentData, key: Buffer) => void,
 ) => {
   const { enqueueSnackbar } = useSnackbar();
   const utils = api.useUtils();
   const [loading, setLoading] = useState(false);
+  const [key, setKey] = useState<Buffer>();
 
   const { mutate: initializePageMutation, isLoading: isInitializePageLoading } =
     api.encryptedDocuments.initialize.useMutation({
-      onSuccess: () => {
+      onSuccess: (data) => {
         void utils.encryptedDocuments.getBase.invalidate();
-        onSuccess();
+        onCreation(data, key!);
         enqueueSnackbar("Successfully initialized!", {
           autoHideDuration: 3000,
           variant: "success",
@@ -60,7 +62,7 @@ export const useInitializeEncryptedDocument = (
         );
         const passwordSalt = createSalt();
         const passwordHash = await hashPassword(password, passwordSalt);
-
+        setKey(documentKey);
         initializePageMutation({
           id,
           encryptedContent: encryptedData,

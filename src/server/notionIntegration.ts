@@ -66,7 +66,7 @@ export class Notion {
 
   async AppendEmbeddedBlock(notionPageId: string, encryptedDocumentId: string) {
     const embeddedUrl =
-      this.embeddedBaseUrl + `/encrypted/${encryptedDocumentId}`;
+      this.embeddedBaseUrl + `/protected/${encryptedDocumentId}`;
     const body = `{"children":[{"object":"block","type":"embed","embed":{"url":"${embeddedUrl}"}}]}`;
     const url = this.appendToPageUrl(notionPageId);
     const response = await api<never>(url, {

@@ -19,6 +19,7 @@ import Editor from "~/components/novel/editor";
 import { ThemeToggle } from "~/components/novel/themeToggle";
 import { type JSONContent } from "novel";
 import CreateForm from "~/components/encryptedDocument/createFormNoClose";
+import { type DocumentData } from "~/types/DocumentData";
 
 export const getStaticProps = (async (ctx) => {
   const slug = ctx.params?.slug;
@@ -33,13 +34,6 @@ export const getStaticPaths = () => {
   return { paths: [], fallback: "blocking" };
 };
 
-interface DocumentData {
-  name: string;
-  decryptedContent: string;
-  iv: string;
-  documentSalt: string;
-}
-
 const EncryptedDocumentPage = ({
   documentId,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
@@ -50,6 +44,12 @@ const EncryptedDocumentPage = ({
   const [documentContent, setDocumentContent] = useState<JSONContent>();
   const [isLoading, setIsLoading] = useState(false);
   const [documentKey, setDocumentKey] = useState<Buffer | undefined>();
+
+  const onCreation = (data: DocumentData, key: Buffer) => {
+    setIsLocked(false);
+    setDocumentData(data);
+    setDocumentKey(key);
+  };
 
   const {
     data: salt,
@@ -264,7 +264,7 @@ const EncryptedDocumentPage = ({
                   )}
                 </>
               ) : (
-                <CreateForm id={documentId} />
+                <CreateForm id={documentId} onCreation={onCreation} />
               )}
             </>
           )}
