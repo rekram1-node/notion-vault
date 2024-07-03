@@ -2,6 +2,7 @@ MVP:
     Functionality needs:
         - update favicon
         - update theme to be prettier
+        - create notion flow
         - speedy load times
 
     Guardrails:
