@@ -22,7 +22,6 @@ export const config = {
     // authenticate root
     "/",
     // authenticate all api/trpc routes besides /protected
-    // "/api/trpc((?!/protected).*)(.*)",
-    "/api/trpc(.*)",
+    "/api/trpc((?!/protected).*)(.*)",
   ],
 };
