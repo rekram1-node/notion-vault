@@ -54,7 +54,7 @@ const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
     setBaseUrl(window.location.href);
   }, []);
 
-  const link = `${baseUrl}encrypted/${document.id}`; // baseUrl contains "/" after it
+  const link = `${baseUrl}protected/${document.id}`; // baseUrl contains "/" after it
 
   const onCopy = () => {
     void navigator.clipboard.writeText(link);

@@ -2,17 +2,21 @@ import { useState } from "react";
 import { debounce } from "lodash";
 import { LoadingSpinner } from "~/components/loading";
 import { useInitializeEncryptedDocument } from "./useInitializeEncryptedDocument";
+import { type DocumentData } from "~/types/DocumentData";
 
 export const getStaticPaths = () => {
   return { paths: [], fallback: "blocking" };
 };
 
-const CreateForm = ({ id }: { id: string }) => {
+const CreateForm = ({
+  id,
+  onCreation,
+}: {
+  id: string;
+  onCreation: (data: DocumentData, key: Buffer) => void;
+}) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { mutate, isLoading } = useInitializeEncryptedDocument(id, () =>
-    closeModal(),
-  );
 
   const validPassword =
     password !== "" && password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/);
@@ -22,10 +26,12 @@ const CreateForm = ({ id }: { id: string }) => {
   const disabled =
     isError || !password || !confirmPassword || confirmPassword !== password;
 
-  const closeModal = () => {
+  const closeModal = (data: DocumentData, key: Buffer) => {
     setPassword("");
     setConfirmPassword("");
+    onCreation(data, key);
   };
+  const { mutate, isLoading } = useInitializeEncryptedDocument(id, closeModal);
 
   const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

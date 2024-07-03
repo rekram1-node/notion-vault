@@ -5,7 +5,7 @@ import { authMiddleware } from "@clerk/nextjs";
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your Middleware
 export default authMiddleware({
   // eventually we will kill off the /editor route since it is for development purposes exclusively...
-  publicRoutes: ["/editor", "/api/clerk", "/encrypted(.*)"],
+  publicRoutes: ["/editor", "/api/clerk", "/protected(.*)"],
 });
 
 export const config = {
@@ -15,9 +15,7 @@ export const config = {
     "/((?!.+\\.[\\w]+$|_next|.*clerk.*).*)",
     // authenticate root
     "/",
-    // authenticate all api/trpc routes besides /encrypted
-    "/api/trpc((?!/encrypted).*)(.*)",
+    // authenticate all api/trpc routes besides /protected
+    "/api/trpc((?!/protected).*)(.*)",
   ],
 };
-
-// http://localhost:3000/encrypted/cly4tdw2d0000mdger7hfe3tq
