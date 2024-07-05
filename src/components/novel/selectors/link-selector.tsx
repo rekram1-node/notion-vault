@@ -2,13 +2,7 @@
 import { cn } from "~/utils/cn";
 import { useEditor } from "novel";
 import { Check, Trash } from "lucide-react";
-import {
-  type Dispatch,
-  type FC,
-  type SetStateAction,
-  useEffect,
-  useRef,
-} from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "~/components/novel/ui/button";
 import {
   PopoverContent,
