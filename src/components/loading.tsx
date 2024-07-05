@@ -1,6 +1,9 @@
-export const LoadingSpinner = (props: { size?: number }) => {
+export const LoadingSpinner = (props: {
+  size?: number;
+  className?: string;
+}) => {
   return (
-    <div role="status">
+    <div role="status" className={props.className}>
       <svg
         aria-hidden="true"
         className="animate-spin fill-slate-300 text-slate-200 dark:text-slate-600"
