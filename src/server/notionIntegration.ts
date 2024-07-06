@@ -4,7 +4,6 @@ import { type Result, ok, error } from "~/server/types/result";
 import { api } from "~/server/utils";
 
 export class Notion {
-  token: string;
   embeddedBaseUrl: string;
   headers: HeadersInit;
   baseUrl = "https://api.notion.com/v1";
@@ -13,9 +12,8 @@ export class Notion {
     this.baseUrl + `/blocks/${pageId}/children`;
 
   constructor(token: string) {
-    this.token = token;
     this.headers = {
-      Authorization: `Bearer ${this.token}`,
+      Authorization: `Bearer ${token}`,
       "Notion-Version": process.env.NOTION_API_VERSION ?? "2022-06-28",
       "Content-Type": "application/json",
     };
@@ -49,12 +47,16 @@ export class Notion {
         if (document.object !== "page") {
           continue;
         }
+
+        const title =
+          document.properties.title?.title[0]?.text.content ??
+          document.properties.title?.title[0]?.plain_text ??
+          `Page - ${document.id}`;
+
         pages.push({
           id: document.id,
           url: document.url,
-          name:
-            document.properties.title?.title[0]?.text.content ??
-            `Page - ${document.id}`,
+          name: title,
         });
       }
 
