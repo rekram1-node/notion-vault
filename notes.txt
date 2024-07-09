@@ -1,3 +1,7 @@
+* Switch to drizzle orm...
+* Delete old table and old index...
+
+
 MVP:
     Functionality needs:
         - update favicon
@@ -23,13 +27,8 @@ In order:
   - some easy way for a user to automatically add an encrypted snippet to their
     notion document from our UI
   - ...
-* UX
-  - once a page is initialized it should send you straight to editor rather than having to 
-    re-enter password
-  - cookies aren't being attached to requests when accessed through notion...
 * 
 * Prettify
-  - Maybe - Adjust the top padding we see on the encrypted pages
 * Preformance improvements
   - investigate any remaining areas with lag
 * Add Guardrails

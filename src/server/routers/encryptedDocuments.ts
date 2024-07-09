@@ -8,52 +8,24 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-// import { Ratelimit } from "@upstash/ratelimit";
-// import { Redis } from "@upstash/redis";
-
-// Create a new ratelimiter, that allows 3 requests per 1 minute
-// const ratelimit = new Ratelimit({
-//   redis: Redis.fromEnv(),
-//   limiter: Ratelimit.slidingWindow(3, "1 m"),
-//   analytics: true,
-// });
-
 export const encryptedDocumentRouter = createTRPCRouter({
   getAll: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx;
-    const documents = await ctx.prisma.encryptedDocument.findMany({
-      where: {
-        userId,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: [{ updatedAt: "desc" }],
-    });
-    return documents;
+    return await ctx.queries.readAllEncryptedDocuments(userId);
   }),
 
   getBase: publicProcedure
     .input(z.object({ id: z.string().length(25) }))
     .query(async ({ ctx, input }) => {
-      const document = await ctx.prisma.encryptedDocument.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
+      const passwordSalt = await ctx.queries.readPasswordSalt(input.id);
 
-      if (!document)
+      if (!passwordSalt)
         throw new TRPCError({
           code: "NOT_FOUND", // error code is used by frontend
           message: "document does not exist",
         });
 
-      const { passwordSalt } = document;
-
-      return {
-        passwordSalt,
-      };
+      return passwordSalt;
     }),
 
   validatePassword: publicProcedure
@@ -64,19 +36,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const document = await ctx.prisma.encryptedDocument.findUnique({
-        where: {
-          id: input.id,
-        },
-        select: {
-          name: true,
-          passwordHash: true,
-          encryptedContent: true,
-          iv: true,
-          documentSalt: true,
-          serverSidePasswordSalt: true,
-        },
-      });
+      const document = await ctx.queries.readEncryptedDocument(input.id);
 
       if (!document)
         throw new TRPCError({
@@ -118,24 +78,6 @@ export const encryptedDocumentRouter = createTRPCRouter({
       };
     }),
 
-  get: publicProcedure
-    .input(z.object({ id: z.string().length(25) }))
-    .query(async ({ ctx, input }) => {
-      const document = await ctx.prisma.encryptedDocument.findUnique({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (!document)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "document does not exist",
-        });
-
-      return document;
-    }),
-
   update: publicProcedure
     .input(
       z.object({
@@ -144,15 +86,12 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const document = await ctx.prisma.encryptedDocument.update({
-        data: {
-          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
-        },
-        where: {
-          id: input.id,
-        },
-      });
-      if (!document)
+      const result = await ctx.queries.updateEncryptedDocument(
+        input.id,
+        Buffer.from(input.encryptedContent, "base64"),
+      );
+
+      if (result.rowsAffected === 0)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "document does not exist",
@@ -177,19 +116,21 @@ export const encryptedDocumentRouter = createTRPCRouter({
         serverSidePasswordSalt,
       );
 
-      const document = await ctx.prisma.encryptedDocument.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
-          passwordHash,
-          passwordSalt: input.passwordSalt,
-          serverSidePasswordSalt,
-          iv: input.iv,
-          documentSalt: input.documentSalt,
-        },
+      const document = await ctx.queries.activateEncryptedDocument(input.id, {
+        encryptedContent: input.encryptedContent,
+        passwordHash,
+        passwordSalt: input.passwordSalt,
+        serverSidePasswordSalt,
+        iv: input.iv,
+        documentSalt: input.documentSalt,
       });
+
+      if (!document) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "document does not exist",
+        });
+      }
 
       return {
         name: document.name,
@@ -203,15 +144,12 @@ export const encryptedDocumentRouter = createTRPCRouter({
     .input(z.object({ id: z.string().length(25) }))
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
+      const result = await ctx.queries.deleteEncryptedDocument(
+        userId,
+        input.id,
+      );
 
-      const document = await ctx.prisma.encryptedDocument.delete({
-        where: {
-          id: input.id,
-          userId,
-        },
-      });
-
-      if (!document)
+      if (result.rowsAffected === 0)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "document does not exist",
@@ -231,8 +169,6 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // const { success } = await ratelimit.limit(authorId);
-      // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
       const { userId } = ctx;
       const serverSidePasswordSalt = createSalt();
       const passwordHash = await hashPassword(
@@ -240,18 +176,16 @@ export const encryptedDocumentRouter = createTRPCRouter({
         serverSidePasswordSalt,
       );
 
-      await ctx.prisma.encryptedDocument.create({
-        data: {
-          userId,
-          name: input.name,
-          encryptedContent: Buffer.from(input.encryptedContent, "base64"),
-          passwordHash,
-          passwordSalt: input.passwordSalt,
-          serverSidePasswordSalt,
-          iv: input.iv,
-          documentSalt: input.documentSalt,
-          notionPageId: "",
-        },
+      await ctx.queries.createEncryptedDocument({
+        userId,
+        name: input.name,
+        encryptedContent: Buffer.from(input.encryptedContent, "base64"),
+        passwordHash,
+        passwordSalt: input.passwordSalt,
+        serverSidePasswordSalt,
+        iv: input.iv,
+        documentSalt: input.documentSalt,
+        notionPageId: "",
       });
     }),
 });

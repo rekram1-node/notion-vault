@@ -11,5 +11,3 @@ export function ok<T>(data?: T): Result<T, never> {
 export function error<E extends Error>(error: E): Result<never, E> {
   return { isOk: false, error };
 }
-
-const Result = { ok, error };

@@ -201,74 +201,65 @@ const EncryptedDocumentPage = ({
     }
   };
 
+  const notFound =
+    !isGetBaseLoading &&
+    isGetBaseError &&
+    getBaseError?.data?.code == "NOT_FOUND";
+
+  const loaded = !isGetBaseLoading && !isGetBaseError;
+  const locked = loaded && salt?.passwordSalt && isLocked;
+  const unlocked = loaded && salt?.passwordSalt && !isLocked && documentData;
+  const notInitialized = loaded && !salt?.passwordSalt;
+
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="h-full w-full">
       {isGetBaseLoading && (
-        <div className="flex h-full w-full items-center justify-center">
-          <div className="bg-surface-100 flex max-w-sm justify-center rounded-lg p-6 shadow-lg">
-            <LoadingSpinner size={60} />
+        <div className="flex h-full flex-col items-center justify-center">
+          <LoadingSpinner size={60} className="m-auto" />
+        </div>
+      )}
+      {notFound && (
+        <div className="flex h-full flex-col items-center justify-center">
+          Invalid Document Link
+        </div>
+      )}
+      {notInitialized && <CreateForm id={documentId} onCreation={onCreation} />}
+      {locked && (
+        <div className="flex h-full flex-col items-center justify-center">
+          <div className="flex w-1/2 flex-col items-center justify-start pt-2">
+            <LockClosedIcon className="mb-5" height={48} width={48} />
+            <div className="pb-5 text-center text-lg">
+              <p>Your content is locked. Verify your</p>
+              <p>password to continue.</p>
+            </div>
+            <PasswordForm
+              inputPlaceholder="Enter Password"
+              submitButtonName="Unlock"
+              isLoading={isValidatePasswordLoading || isLoading}
+              handlePassword={handlePasswordSubmit}
+            />
           </div>
         </div>
       )}
-      {!isGetBaseLoading && (
-        <>
-          {isGetBaseError && getBaseError.data?.code === "NOT_FOUND" ? (
-            <div className="flex h-full w-full items-center justify-center">
-              Invalid Document Link
-            </div>
-          ) : (
-            <>
-              {salt?.passwordSalt ? (
-                <>
-                  {isLocked && (
-                    <div className="flex w-1/2 flex-col items-center justify-start pt-2">
-                      <LockClosedIcon className="mb-5" height={48} width={48} />
-                      <div className="pb-5 text-center text-lg">
-                        <p className="">Your content is locked. Verify your</p>
-                        <p className="">password to continue.</p>
-                      </div>
-                      <PasswordForm
-                        inputPlaceholder="Enter Password"
-                        submitButtonName="Unlock"
-                        isLoading={isValidatePasswordLoading || isLoading}
-                        handlePassword={handlePasswordSubmit}
-                      />
-                    </div>
-                  )}
-                  {!isLocked && documentData && (
-                    <div className="flex h-full w-screen flex-col gap-6 rounded-md bg-background p-6 pb-10">
-                      <div className="flex items-center justify-between">
-                        <h1 className="text-4xl font-semibold">
-                          {documentData.name}
-                        </h1>
-                        <div className="flex">
-                          <ThemeToggle />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="ml-2"
-                            onClick={() => setIsLocked(true)}
-                          >
-                            <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
-                            <span className="sr-only">Lock Document</span>
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="">
-                        <Editor
-                          initialValue={documentContent}
-                          onChange={autoSave}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <CreateForm id={documentId} onCreation={onCreation} />
-              )}
-            </>
-          )}
-        </>
+      {unlocked && (
+        <div className="absolute left-0 top-0 flex h-full w-full flex-col p-6 pb-10">
+          <div className="mb-6 flex w-full items-center justify-between">
+            <div className="flex-grow" />
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-2"
+              onClick={() => setIsLocked(true)}
+            >
+              <LockOpen1Icon className="h-[1.2rem] w-[1.2rem] scale-100" />
+              <span className="sr-only">Lock Document</span>
+            </Button>
+          </div>
+          <div className="flex-grow pb-10">
+            <Editor initialValue={documentContent} onChange={autoSave} />
+          </div>
+        </div>
       )}
     </div>
   );
