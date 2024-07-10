@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createSalt } from "~/encryption/encryption";
 import { hashPassword } from "~/encryption/serverEncryption";
+import { env } from "~/env";
 import {
   createTRPCRouter,
   privateProcedure,
@@ -169,14 +170,25 @@ export const encryptedDocumentRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx;
+      const { userId, queries } = ctx;
+
+      const numberOfDocuments =
+        await queries.readNumberOfEncryptedDocuments(userId);
+
+      if (numberOfDocuments === env.MAX_PAGES) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "you have reached the max number of protected pages",
+        });
+      }
+
       const serverSidePasswordSalt = createSalt();
       const passwordHash = await hashPassword(
         input.passwordHash,
         serverSidePasswordSalt,
       );
 
-      await ctx.queries.createEncryptedDocument({
+      await queries.createEncryptedDocument({
         userId,
         name: input.name,
         encryptedContent: Buffer.from(input.encryptedContent, "base64"),

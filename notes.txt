@@ -1,6 +1,7 @@
-* Switch to drizzle orm...
 * Delete old table and old index...
-
+* Ensure that user is actually signed out when auth fails..
+* Add functionality with 3 dots that allows for someone to append to notion from our append
+* Add page limit functionality and max size functionality!
 
 MVP:
     Functionality needs:

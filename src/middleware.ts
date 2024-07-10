@@ -2,6 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { Notion } from "./server/notionIntegration";
 import { Queries } from "./server/db/queries";
 import { db } from "./server/db/db";
+import { env } from "./env";
 
 const isProtectedRoute = createRouteMatcher(["/"]);
 
@@ -32,8 +33,12 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     const documents = await queries.readAllEncryptedDocuments(userId);
+    let count = 0;
 
     for (const page of pages.data) {
+      count += 1;
+      if (count > env.MAX_PAGES) return; // user has reached max # of pages
+
       // check if a page has already been created
       if (documents.some((document) => document.notionPageId === page.id)) {
         continue;

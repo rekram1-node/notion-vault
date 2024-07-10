@@ -32,6 +32,7 @@ type CreateContextOptions = Record<string, never>;
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   const queries = new Queries(db);
   return {
+    db,
     queries,
   };
 };

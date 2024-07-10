@@ -4,11 +4,16 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 import CreateForm from "~/components/encryptedDocument/createForm";
 import EncryptedDocumentSkeleton from "~/components/encryptedDocument/encryptedDocumentSkeleton";
+import { env } from "~/env";
 
 const Home = () => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const { data: documents, isLoading } =
     api.encryptedDocuments.getAll.useQuery();
+
+  const disabled =
+    isLoading ||
+    (documents && documents.length >= Number(env.NEXT_PUBLIC_MAX_PAGES));
 
   return (
     <>
@@ -18,9 +23,12 @@ const Home = () => {
             <h5 className="text-xl font-semibold">Your Protected Pages</h5>
             <button
               onClick={() => setIsCreateModalVisible(true)}
+              disabled={disabled}
               title="Create protected page"
             >
-              <PlusCircledIcon className="h-10 w-10 rounded-full bg-primary text-accent hover:brightness-75" />
+              <PlusCircledIcon
+                className={`h-10 w-10 rounded-full bg-primary text-accent hover:brightness-75 ${disabled ? "cursor-not-allowed opacity-20" : ""}`}
+              />
             </button>
           </div>
           {isLoading &&
