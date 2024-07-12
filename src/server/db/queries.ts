@@ -118,6 +118,5 @@ interface InitializeData {
 }
 
 async function getFirstElement<T>(array: Promise<T[]>): Promise<T | undefined> {
-  const result = await array;
-  return result?.[0];
+  return array.then((result) => result?.[0]);
 }
