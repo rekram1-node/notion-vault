@@ -50,6 +50,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    MAX_PAGES: z.coerce.number().default(5),
   },
 
   /**
@@ -59,6 +60,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_MAX_PAGES: z.coerce.number().default(5),
   },
 
   /**
@@ -77,6 +79,8 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     NOTION_VAULT_URL: process.env.NOTION_VAULT_URL,
     NOTION_API_VERSION: process.env.NOTION_API_VERSION,
+    MAX_PAGES: process.env.MAX_PAGES,
+    NEXT_PUBLIC_MAX_PAGES: process.env.NEXT_PUBLIC_MAX_PAGES,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
