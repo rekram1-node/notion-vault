@@ -3,20 +3,61 @@ import { z } from "zod";
 import { createSalt } from "~/encryption/encryption";
 import { hashPassword } from "~/encryption/serverEncryption";
 import { env } from "~/env";
+import { Notion } from "~/lib/notion/notion";
 import {
   createTRPCRouter,
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 
+const encryptedDocumentSchema = z.object({
+  id: z.string().cuid2(),
+  name: z.string().min(1).max(280),
+  encryptedContent: z.string(),
+  passwordHash: z.string().length(98),
+  passwordSalt: z.string().length(24),
+  iv: z.string().length(24),
+  documentSalt: z.string().length(24),
+});
+
 export const encryptedDocumentRouter = createTRPCRouter({
+  addToNotionDocument: privateProcedure
+    .input(
+      z.object({
+        pageId: z.string(),
+        encryptedDocumentId: z.string().cuid2(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const notion = await Notion.New(userId);
+      if (!notion.isOk) {
+        console.error(notion.error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "failed to get notion connection",
+        });
+      }
+      const result = await notion.data.AppendEmbeddedBlock(
+        input.pageId,
+        input.encryptedDocumentId,
+      );
+      if (!result.isOk) {
+        console.error(result.error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "failed to append to notion",
+        });
+      }
+    }),
+
   getAll: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx;
     return await ctx.queries.readAllEncryptedDocuments(userId);
   }),
 
   getBase: publicProcedure
-    .input(z.object({ id: z.string().length(25) }))
+    .input(encryptedDocumentSchema.pick({ id: true }))
     .query(async ({ ctx, input }) => {
       const passwordSalt = await ctx.queries.readPasswordSalt(input.id);
 
@@ -30,12 +71,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
     }),
 
   validatePassword: publicProcedure
-    .input(
-      z.object({
-        id: z.string().length(25),
-        hashedPassword: z.string().length(98),
-      }),
-    )
+    .input(encryptedDocumentSchema.pick({ id: true, passwordHash: true }))
     .mutation(async ({ ctx, input }) => {
       const document = await ctx.queries.readEncryptedDocument(input.id);
 
@@ -59,7 +95,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
 
       // execute addition hashing for comparison to DB
       const passwordHash = await hashPassword(
-        input.hashedPassword,
+        input.passwordHash,
         document.serverSidePasswordSalt,
       );
 
@@ -79,13 +115,8 @@ export const encryptedDocumentRouter = createTRPCRouter({
       };
     }),
 
-  update: publicProcedure
-    .input(
-      z.object({
-        id: z.string().length(25),
-        encryptedContent: z.string(),
-      }),
-    )
+  update: privateProcedure
+    .input(encryptedDocumentSchema.pick({ id: true, encryptedContent: true }))
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.queries.updateEncryptedDocument(
         input.id,
@@ -101,13 +132,13 @@ export const encryptedDocumentRouter = createTRPCRouter({
 
   initialize: publicProcedure
     .input(
-      z.object({
-        id: z.string().length(25),
-        encryptedContent: z.string(),
-        passwordHash: z.string().length(98),
-        passwordSalt: z.string().length(24),
-        iv: z.string().length(24),
-        documentSalt: z.string().length(24),
+      encryptedDocumentSchema.pick({
+        id: true,
+        encryptedContent: true,
+        passwordHash: true,
+        passwordSalt: true,
+        iv: true,
+        documentSalt: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -142,7 +173,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
     }),
 
   delete: privateProcedure
-    .input(z.object({ id: z.string().length(25) }))
+    .input(encryptedDocumentSchema.pick({ id: true }))
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
       const result = await ctx.queries.deleteEncryptedDocument(
@@ -160,13 +191,13 @@ export const encryptedDocumentRouter = createTRPCRouter({
   // We could make this more strict
   create: privateProcedure
     .input(
-      z.object({
-        name: z.string().min(1).max(280),
-        encryptedContent: z.string(),
-        passwordHash: z.string().length(98),
-        passwordSalt: z.string().length(24),
-        iv: z.string().length(24),
-        documentSalt: z.string().length(24),
+      encryptedDocumentSchema.pick({
+        name: true,
+        encryptedContent: true,
+        passwordHash: true,
+        passwordSalt: true,
+        iv: true,
+        documentSalt: true,
       }),
     )
     .mutation(async ({ ctx, input }) => {

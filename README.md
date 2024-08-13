@@ -3,17 +3,14 @@
 Notion Vault is (going to be) a free open source integration for Notion that allows someone to have end to end encrypted
 text content embedded in their Notion pages.
 
-# Encryption
+## Encryption
 
 * Encryption follows (owasp cheat sheet recommendations)[https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#introduction]
 * We use argon2id for key derivation from a password that is used to encrypt content using AES-256-CBC.
+* The encrypted pages/documents follow owasp recommendations for (insecure direct object reference prevention)[https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html]
 
-# Development/Running things
+## Contributing
 
-Notion Vault uses clerk as the authentication provider with Notion being the 
-only allowed social connection.
+See Contributing.md
 
-
-
-Update personal notion secret if possible...
 

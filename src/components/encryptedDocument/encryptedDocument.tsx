@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { api } from "~/utils/api";
@@ -7,6 +7,8 @@ import {
   CopyIcon,
   TrashIcon,
   FileTextIcon,
+  DotsVerticalIcon,
+  PlusIcon,
 } from "@radix-ui/react-icons";
 import Modal from "../modal";
 
@@ -15,17 +17,30 @@ export interface EncryptedDocument {
   name: string;
 }
 
-const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
+interface EncryptedDocumentProps {
+  document: EncryptedDocument;
+  onAddToNotion: () => void;
+  setSelectedPage: (pageId: string) => void;
+}
+
+const EncryptedDocument = ({
+  document,
+  onAddToNotion,
+  setSelectedPage,
+}: EncryptedDocumentProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [baseUrl, setBaseUrl] = useState("");
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [baseUrl, setBaseUrl] = useState<string>("");
+  const [isDeleteModalVisible, setIsDeleteModalVisible] =
+    useState<boolean>(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const utils = api.useUtils();
 
   const { mutate, isLoading: isDeleteLoading } =
     api.encryptedDocuments.delete.useMutation({
       onSuccess: () => {
         void utils.encryptedDocuments.getAll.invalidate();
-        setIsDeleteModalVisible(false); // Close the modal
+        setIsDeleteModalVisible(false);
         enqueueSnackbar(`Deleted ${document.name}`, {
           autoHideDuration: 3000,
           variant: "success",
@@ -51,10 +66,26 @@ const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
     });
 
   useEffect(() => {
-    setBaseUrl(window.location.href);
+    const currentUrl = new URL(window.location.href);
+    const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+    setBaseUrl(baseUrl);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownVisible(false);
+      }
+    };
+
+    window.document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      window.document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  const link = `${baseUrl}protected/${document.id}`; // baseUrl contains "/" after it
+  const link = `${baseUrl}/protected/${document.id}`;
 
   const onCopy = () => {
     void navigator.clipboard.writeText(link);
@@ -62,6 +93,11 @@ const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
       autoHideDuration: 3000,
       variant: "info",
     });
+    setIsDropdownVisible(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
   };
 
   return (
@@ -72,30 +108,64 @@ const EncryptedDocument = ({ document }: { document: EncryptedDocument }) => {
             <div className="card variant-glass flex items-center justify-start p-6">
               <FileTextIcon className="mr-4 h-6 w-6" />
               <h5 className="h5 text-xl">{document.name}</h5>
-              <div className="ml-auto flex items-center space-x-3">
+              <div className="ml-auto flex items-center">
                 <button
-                  className="mr-1"
-                  onClick={onCopy}
-                  title="Copy protected page url to clipboard"
+                  className="relative"
+                  onClick={() => {
+                    toggleDropdown();
+                    setSelectedPage(document.id);
+                  }}
+                  title="More options"
                 >
-                  <CopyIcon className="h-6 w-6" />
+                  <DotsVerticalIcon className="h-6 w-6" />
                 </button>
-                <Link
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className=""
-                  title="Open protected page in new tab"
-                >
-                  <OpenInNewWindowIcon className="h-6 w-6" />
-                </Link>
-                <button
-                  className=""
-                  onClick={() => setIsDeleteModalVisible(true)}
-                  title="Delete protected page"
-                >
-                  <TrashIcon className="h-6 w-6" />
-                </button>
+                {isDropdownVisible && (
+                  <div
+                    ref={dropdownRef}
+                    className="card absolute right-0 top-full z-50 mt-2 w-48 origin-top-right rounded-xl border-2 bg-card ring-black ring-opacity-5"
+                  >
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          onAddToNotion();
+                          toggleDropdown();
+                        }}
+                        className="flex w-full items-center px-4 py-2 text-sm hover:bg-accent"
+                      >
+                        <PlusIcon className="mr-3 h-5 w-5" />
+                        Add to Notion
+                      </button>
+                      <button
+                        onClick={onCopy}
+                        className="flex w-full items-center px-4 py-2 text-sm hover:bg-accent"
+                      >
+                        <CopyIcon className="mr-3 h-5 w-5" />
+                        Copy URL
+                      </button>
+                      <Link
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsDropdownVisible(false)}
+                      >
+                        <div className="flex w-full items-center px-4 py-2 text-sm hover:bg-accent">
+                          <OpenInNewWindowIcon className="mr-3 h-5 w-5" />
+                          Open in new tab
+                        </div>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setIsDeleteModalVisible(true);
+                          setIsDropdownVisible(false);
+                        }}
+                        className="flex w-full items-center px-4 py-2 text-sm hover:bg-accent"
+                      >
+                        <TrashIcon className="mr-3 h-5 w-5" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

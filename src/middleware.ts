@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { Notion } from "./server/notionIntegration";
-import { Queries } from "./server/db/queries";
+import { Notion } from "~/lib/notion/notion";
+import { Queries } from "~/server/db/queries";
 import { db } from "./server/db/db";
 import { env } from "./env";
 import { encryptedDocumentsTable } from "./server/db/schema";
