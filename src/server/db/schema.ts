@@ -9,8 +9,7 @@ import {
 import { init } from "@paralleldrive/cuid2";
 
 const createId = init({
-  // backwards compatibility with prisma cuid generation
-  length: 25,
+  length: 32,
 });
 
 export const encryptedDocumentsTable = sqliteTable(

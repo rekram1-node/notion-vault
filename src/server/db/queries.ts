@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { type DbType } from "./db";
 import {
   type InsertEncryptedDocument,
@@ -45,6 +45,18 @@ export class Queries {
       .from(encryptedDocumentsTable)
       .where(eq(encryptedDocumentsTable.userId, userId))
       .orderBy(desc(encryptedDocumentsTable.updated_at));
+  }
+
+  async readNumberOfEncryptedDocuments(userId: string) {
+    const result = await getFirstElement(
+      this.db
+        .select({
+          value: count(),
+        })
+        .from(encryptedDocumentsTable)
+        .where(eq(encryptedDocumentsTable.userId, userId)),
+    );
+    return result?.value ?? 0;
   }
 
   async readPasswordSalt(id: string) {
@@ -106,6 +118,5 @@ interface InitializeData {
 }
 
 async function getFirstElement<T>(array: Promise<T[]>): Promise<T | undefined> {
-  const result = await array;
-  return result?.[0];
+  return array.then((result) => result?.[0]);
 }

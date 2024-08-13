@@ -32,6 +32,7 @@ type CreateContextOptions = Record<string, never>;
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   const queries = new Queries(db);
   return {
+    db,
     queries,
   };
 };
@@ -46,10 +47,12 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req } = opts;
   const { queries } = createInnerTRPCContext({});
   const userId = getAuth(req).userId;
+  const token = await getAuth(req).getToken();
 
   return {
     queries,
     userId,
+    token,
   };
 };
 
@@ -110,6 +113,7 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       userId: ctx.userId,
+      token: ctx.token,
     },
   });
 });

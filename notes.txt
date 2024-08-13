@@ -1,6 +1,5 @@
-* Switch to drizzle orm...
-* Delete old table and old index...
-
+* Add functionality with 3 dots that allows for someone to append to notion from our append
+* Add page limit functionality and max size functionality!
 
 MVP:
     Functionality needs:
@@ -22,12 +21,9 @@ MVP:
 
 In order:
 * Create full integration, new sign ups and sign ins should auto create encrypted docs
-  - Ensure Webhook has permissions to do these things - test and iterate
   - needs to handle cases where insufficient permissions are given...
   - some easy way for a user to automatically add an encrypted snippet to their
     notion document from our UI
-  - ...
-* 
 * Prettify
 * Preformance improvements
   - investigate any remaining areas with lag

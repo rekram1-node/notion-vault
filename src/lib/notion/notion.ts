@@ -1,7 +1,7 @@
-import { type SearchPagesResponse } from "~/server/types/notion";
-import { clerkClient } from "@clerk/nextjs/server";
-import { type Result, ok, error } from "~/server/types/result";
+import { type SearchPagesResponse } from "~/server/types/notionSearchPagesResponse";
+import { ok, error } from "~/server/types/result";
 import { api } from "~/server/utils";
+import { readToken } from "~/server/clerk/readToken";
 
 export class Notion {
   embeddedBaseUrl: string;
@@ -22,7 +22,7 @@ export class Notion {
   }
 
   static async New(clerkUserId: string) {
-    const token = await readNotionToken(clerkUserId);
+    const token = await readToken(clerkUserId);
     if (!token.isOk) {
       return token;
     }
@@ -88,26 +88,3 @@ export interface Page {
   url: string;
   name: string;
 }
-
-const provider = "oauth_notion";
-
-const readNotionToken = async (userId: string): Promise<Result<string>> => {
-  try {
-    const { data, totalCount } =
-      await clerkClient().users.getUserOauthAccessToken(userId, provider);
-
-    if (totalCount === 0 || data.length === 0) {
-      return error(new Error("failed to read token, empty response"));
-    }
-
-    const oauth = data[0];
-    if (!oauth?.token) {
-      return error(
-        new Error(`response doesn't contain token: ${JSON.stringify(oauth)}`),
-      );
-    }
-    return ok(oauth.token);
-  } catch (e) {
-    return error(new Error(String(e)));
-  }
-};

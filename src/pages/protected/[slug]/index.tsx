@@ -103,7 +103,6 @@ const EncryptedDocumentPage = ({
     },
   });
 
-  // need to adjust loading here
   const handlePasswordSubmit = async (
     password: string,
   ): Promise<PasswordSubmitResult> => {
@@ -132,7 +131,7 @@ const EncryptedDocumentPage = ({
 
       validatePasswordMutation({
         id: documentId,
-        hashedPassword: passwordHash,
+        passwordHash: passwordHash,
       });
     } catch (e) {
       return {
@@ -146,10 +145,9 @@ const EncryptedDocumentPage = ({
     };
   };
 
-  // ignore loading for now...
   const { mutate } = api.encryptedDocuments.update.useMutation({
-    // ignore on success for now...
     onSuccess: () => {
+      // ignore on success for now...
       // enqueueSnackbar("saved changes", {
       //   autoHideDuration: 2000,
       //   variant: "success",
