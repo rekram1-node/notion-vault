@@ -115,7 +115,7 @@ export const encryptedDocumentRouter = createTRPCRouter({
       };
     }),
 
-  update: privateProcedure
+  update: publicProcedure
     .input(encryptedDocumentSchema.pick({ id: true, encryptedContent: true }))
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.queries.updateEncryptedDocument(

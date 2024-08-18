@@ -1,6 +1,6 @@
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import EncryptedDocument from "~/components/encryptedDocument/encryptedDocument";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/utils/api";
 import CreateForm from "~/components/encryptedDocument/createForm";
 import EncryptedDocumentSkeleton from "~/components/encryptedDocument/encryptedDocumentSkeleton";
@@ -45,32 +45,31 @@ const Home = ({ notionPages }: { notionPages: Page[] }) => {
     isLoading ||
     (documents && documents.length >= Number(env.NEXT_PUBLIC_MAX_PAGES));
 
-  const { mutate, isLoading: isAppendLoading } =
-    api.encryptedDocuments.addToNotionDocument.useMutation({
-      onSuccess: () => {
-        enqueueSnackbar("Added document to notion", {
+  const { mutate } = api.encryptedDocuments.addToNotionDocument.useMutation({
+    onSuccess: () => {
+      enqueueSnackbar("Added document to notion", {
+        autoHideDuration: 3000,
+        variant: "success",
+      });
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage?.[0]) {
+        enqueueSnackbar(errorMessage[0], {
           autoHideDuration: 3000,
-          variant: "success",
+          variant: "error",
         });
-      },
-      onError: (e) => {
-        const errorMessage = e.data?.zodError?.fieldErrors.content;
-        if (errorMessage?.[0]) {
-          enqueueSnackbar(errorMessage[0], {
+      } else {
+        enqueueSnackbar(
+          "Failed to add protected page! Please try again later.",
+          {
             autoHideDuration: 3000,
             variant: "error",
-          });
-        } else {
-          enqueueSnackbar(
-            "Failed to add protected page! Please try again later.",
-            {
-              autoHideDuration: 3000,
-              variant: "error",
-            },
-          );
-        }
-      },
-    });
+          },
+        );
+      }
+    },
+  });
 
   const onAddToNotion = (pageId: string) => {
     if (!selectedPage) {

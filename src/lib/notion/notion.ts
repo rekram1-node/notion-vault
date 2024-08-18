@@ -24,7 +24,7 @@ export class Notion {
   static async New(clerkUserId: string) {
     const token = await readToken(clerkUserId);
     if (!token.isOk) {
-      return token;
+      return error(new Error("failed to read token", { cause: token.error }));
     }
 
     return ok(new Notion(token.data));
@@ -39,7 +39,9 @@ export class Notion {
         headers: this.headers,
       });
       if (!response.isOk) {
-        return response;
+        return error(
+          new Error("failed to retrieve pages", { cause: response.error }),
+        );
       }
 
       const pages: Page[] = [];
@@ -62,7 +64,7 @@ export class Notion {
 
       return ok(pages);
     } catch (e) {
-      return error(new Error(`failed to read pages: ${String(e)}`));
+      return error(new Error(`failed to read pages`, { cause: e }));
     }
   }
 
@@ -77,7 +79,9 @@ export class Notion {
       headers: this.headers,
     });
     if (!response.isOk) {
-      return response;
+      return error(
+        new Error("failed to append to block", { cause: response.error }),
+      );
     }
     return ok();
   }
