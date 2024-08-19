@@ -41,11 +41,9 @@ const Editor = ({ initialValue, onChange }: EditorProp) => {
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedOnChange = useCallback(
-    (value: JSONContent) => {
-      const debouncedFunction = debounce((v: JSONContent) => onChange(v), 2000);
-      debouncedFunction(value);
-    },
+    debounce((value: JSONContent) => onChange(value), 2000),
     [onChange],
   );
 

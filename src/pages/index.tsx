@@ -38,8 +38,22 @@ const Home = ({ notionPages }: { notionPages: Page[] }) => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isNotionModalVisible, setIsNotionModalVisible] = useState(false);
   const [selectedPage, setSelectedPage] = useState<null | string>();
-  const { data: documents, isLoading } =
-    api.encryptedDocuments.getAll.useQuery();
+  const {
+    data: documents,
+    isLoading,
+    isError: isGetDocumentsError,
+    error: getDocumentsError,
+  } = api.encryptedDocuments.getAll.useQuery();
+
+  if (isGetDocumentsError) {
+    enqueueSnackbar(
+      "Failed to read protected pages: " + getDocumentsError.message,
+      {
+        autoHideDuration: 3000,
+        variant: "error",
+      },
+    );
+  }
 
   const disabled =
     isLoading ||
