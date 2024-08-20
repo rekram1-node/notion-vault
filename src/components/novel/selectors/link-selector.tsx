@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { cn } from "~/utils/cn";
 import { useEditor } from "novel";
 import { Check, Trash } from "lucide-react";
@@ -77,8 +76,7 @@ export const LinkSelector = ({ open, onOpenChange }: LinkSelectorProps) => {
             type="text"
             placeholder="Paste a link"
             className="flex-1 bg-background p-1 text-sm outline-none"
-            // className="flex-1 p-1 text-sm outline-none"
-            defaultValue={editor.getAttributes("link").href || ""}
+            defaultValue={editor.getAttributes("link").href as string}
           />
           {editor.getAttributes("link").href ? (
             <Button

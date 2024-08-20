@@ -82,8 +82,7 @@ const EncryptedDocumentPage = ({
       });
       setIsLoading(false);
       setIsLocked(false);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const content: JSONContent = JSON.parse(decryptedContent);
+      const content = JSON.parse(decryptedContent) as JSONContent;
       setDocumentContent(content);
     },
     onError: (e) => {

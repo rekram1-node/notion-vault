@@ -67,7 +67,7 @@ export const useCreateEncryptedDocument = (onSuccess: () => void) => {
           documentSalt: documentSalt.toString("base64"),
         });
       } catch (e: unknown) {
-        enqueueSnackbar("Failed to hash password", {
+        enqueueSnackbar("Failed to hash password: " + String(e), {
           autoHideDuration: 3000,
           variant: "error",
         });
@@ -75,8 +75,7 @@ export const useCreateEncryptedDocument = (onSuccess: () => void) => {
         setLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [createPageMutate],
+    [createPageMutate, enqueueSnackbar],
   );
   const isLoading = loading || isCreatePageLoading;
 
